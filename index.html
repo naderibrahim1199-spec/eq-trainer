@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="EQ Trainer">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<title>EQ Ear Trainer</title>
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --bg2: #1a1a1a;
+    --bg3: #242424;
+    --border: rgba(255,255,255,0.08);
+    --border2: rgba(255,255,255,0.15);
+    --text: #f0f0f0;
+    --text2: #999;
+    --text3: #666;
+    --accent: #3b82f6;
+    --accent-bg: rgba(59,130,246,0.15);
+    --success: #22c55e;
+    --success-bg: rgba(34,197,94,0.15);
+    --danger: #ef4444;
+    --danger-bg: rgba(239,68,68,0.15);
+    --warn: #f59e0b;
+    --warn-bg: rgba(245,158,11,0.15);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; overflow: hidden; }
+
+  #app {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: var(--safe-top);
+  }
+
+  /* Top nav */
+  .topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px 10px;
+    border-bottom: 0.5px solid var(--border);
+    flex-shrink: 0;
+  }
+  .topbar h1 { font-size: 17px; font-weight: 600; letter-spacing: -0.3px; }
+  .topbar .subtitle { font-size: 12px; color: var(--text2); margin-top: 1px; }
+
+  /* Bottom tab bar */
+  .tabbar {
+    display: flex;
+    border-top: 0.5px solid var(--border);
+    padding-bottom: var(--safe-bottom);
+    flex-shrink: 0;
+    background: var(--bg);
+  }
+  .tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    padding: 10px 4px 8px;
+    font-size: 10px;
+    color: var(--text3);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+  }
+  .tab.active { color: var(--accent); }
+  .tab svg { width: 22px; height: 22px; }
+
+  /* Scrollable content */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+  }
+
+  /* Screens */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--bg2);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    margin-bottom: 12px;
+  }
+  .card-title { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; font-size: 11px; }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 10px 16px;
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text);
+    font-size: 14px; font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: opacity 0.1s;
+    -webkit-user-select: none;
+  }
+  .btn:active { opacity: 0.7; transform: scale(0.97); }
+  .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .btn-sm { padding: 7px 12px; font-size: 13px; }
+  .btn-block { width: 100%; }
+  .btn-danger { border-color: var(--danger); color: var(--danger); }
+
+  /* Pill buttons (for mode toggles) */
+  .pill-group { display: flex; gap: 6px; flex-wrap: wrap; }
+  .pill {
+    padding: 7px 14px;
+    border: 0.5px solid var(--border2);
+    border-radius: 20px;
+    background: transparent;
+    color: var(--text2);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  .pill:active { opacity: 0.7; }
+  .pill.active { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+  .pill.active-success { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+  .pill.active-danger { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+
+  /* Freq grid */
+  .freq-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
+  .freq-btn {
+    padding: 14px 4px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg3);
+    color: var(--text);
+    font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    text-align: center;
+    font-family: inherit;
+  }
+  .freq-btn:active { opacity: 0.7; transform: scale(0.96); }
+  .freq-btn.correct { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+  .freq-btn.wrong { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+  .freq-btn.selected { background: var(--accent-bg); border-color: var(--accent); color: var(--accent); }
+
+  /* Stats row */
+  .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+  .stat-card { background: var(--bg3); border-radius: var(--radius-sm); padding: 12px; text-align: center; }
+  .stat-val { font-size: 26px; font-weight: 700; line-height: 1; }
+  .stat-label { font-size: 11px; color: var(--text2); margin-top: 4px; }
+
+  /* EQ Canvas */
+  #eq-canvas { width: 100%; height: 120px; display: block; border-radius: var(--radius-sm); background: var(--bg3); margin-bottom: 14px; }
+
+  /* Slider */
+  .slider-row { display: flex; align-items: center; gap: 10px; margin: 6px 0; }
+  .slider-row label { font-size: 12px; color: var(--text2); min-width: 28px; }
+  .slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
+  .slider-val { font-size: 13px; font-weight: 600; min-width: 38px; text-align: right; color: var(--text); }
+
+  /* Badge */
+  .badge { display: inline-block; font-size: 11px; padding: 3px 9px; border-radius: 20px; font-weight: 500; }
+  .badge-info { background: var(--accent-bg); color: var(--accent); }
+  .badge-success { background: var(--success-bg); color: var(--success); }
+  .badge-danger { background: var(--danger-bg); color: var(--danger); }
+  .badge-warn { background: var(--warn-bg); color: var(--warn); }
+  .badge-neutral { background: var(--bg3); color: var(--text2); }
+
+  /* Result */
+  .result-box { background: var(--bg3); border-radius: var(--radius-sm); padding: 14px; margin-top: 12px; }
+  .result-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .result-detail { font-size: 13px; color: var(--text2); }
+
+  /* Meter */
+  .meter { height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; margin: 8px 0; }
+  .meter-fill { height: 100%; border-radius: 3px; transition: width 0.4s; }
+
+  /* Timer */
+  .timer-wrap { display: flex; align-items: center; gap: 8px; }
+
+  /* Upload */
+  .upload-zone {
+    border: 1.5px dashed var(--border2);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    text-align: center;
+    cursor: pointer;
+    color: var(--text2);
+    font-size: 14px;
+  }
+  .upload-zone:active { opacity: 0.7; }
+
+  /* Section label */
+  .section-label { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text3); margin: 16px 0 8px; }
+  .section-label:first-child { margin-top: 0; }
+
+  /* History item */
+  .hist-item { display: flex; justify-content: space-between; align-items: center; padding: 11px 0; border-bottom: 0.5px solid var(--border); font-size: 13px; }
+  .hist-item:last-child { border-bottom: none; }
+  .hist-freq { font-weight: 500; }
+  .hist-meta { color: var(--text2); font-size: 12px; margin-top: 2px; }
+
+  /* Progress chart */
+  #prog-canvas { width: 100%; height: 160px; display: block; }
+
+  /* Divider */
+  .divider { height: 0.5px; background: var(--border); margin: 14px 0; }
+
+  /* Play bar */
+  .play-bar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+
+  /* Q hint */
+  .q-hint { font-size: 12px; color: var(--text3); margin-top: 6px; font-style: italic; }
+
+  /* Big start button */
+  .start-btn {
+    width: 100%;
+    padding: 18px;
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    color: #fff;
+    font-size: 17px;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .start-btn:active { opacity: 0.8; transform: scale(0.98); }
+
+  select {
+    width: 100%;
+    padding: 10px 12px;
+    background: var(--bg3);
+    border: 0.5px solid var(--border2);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    margin-bottom: 10px;
+  }
+
+  /* Info text */
+  .info { font-size: 13px; color: var(--text2); line-height: 1.5; }
+
+  /* Scrollable section (history list) */
+  .scroll-list { max-height: 400px; overflow-y: auto; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div>
+      <div class="topbar h1" id="topbar-title" style="font-size:17px;font-weight:600;letter-spacing:-0.3px">EQ Ear Trainer</div>
+      <div class="subtitle" id="topbar-sub">Guess mode · Beginner</div>
+    </div>
+    <div id="topbar-right"></div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <div class="section-label">Audio source</div>
+      <div class="card" style="padding:12px">
+        <div class="pill-group" style="margin-bottom:10px">
+          <button class="pill active" id="src-pink" onclick="setSource('pink')">Pink noise</button>
+          <button class="pill" id="src-white" onclick="setSource('white')">White noise</button>
+          <button class="pill" id="src-file" onclick="setSource('file')">My file</button>
+        </div>
+        <div id="file-area" style="display:none">
+          <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+            <div style="font-size:24px;margin-bottom:6px">🎵</div>
+            <div>Tap to load audio file</div>
+            <div style="font-size:12px;margin-top:4px;color:var(--text3)" id="file-name">MP3, WAV, OGG supported</div>
+          </div>
+          <input type="file" id="file-input" accept=".mp3,.wav,.ogg,.aac,.m4a" style="display:none" onchange="loadFile(this)">
+        </div>
+        <div id="noise-note" style="font-size:12px;color:var(--text3)">Pink noise — great for beginners</div>
+      </div>
+
+      <div class="section-label">Session</div>
+      <div class="stats-grid" style="margin-bottom:12px">
+        <div class="stat-card"><div class="stat-val" id="stat-score">0</div><div class="stat-label">Score</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-acc">—</div><div class="stat-label">Accuracy</div></div>
+      </div>
+
+      <button class="start-btn" onclick="startRound()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+        Start training
+      </button>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="screen" id="screen-quiz">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <span class="badge badge-info" id="quiz-mode-badge">Guess mode</span>
+          <span class="badge badge-neutral" id="quiz-q-badge">Q 1.41</span>
+          <span class="badge badge-neutral" id="quiz-filter-badge">Bell</span>
+        </div>
+        <div class="timer-wrap" id="timer-wrap" style="display:none">
+          <svg width="30" height="30" viewBox="0 0 30 30">
+            <circle cx="15" cy="15" r="12" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2.5"/>
+            <circle id="timer-arc" cx="15" cy="15" r="12" fill="none" stroke="#3b82f6" stroke-width="2.5"
+              stroke-dasharray="75.4" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 15 15)"
+              style="transition:stroke-dashoffset 1s linear"/>
+          </svg>
+          <span style="font-size:15px;font-weight:600;min-width:20px" id="timer-text">10</span>
+        </div>
+      </div>
+
+      <canvas id="eq-canvas" height="120"></canvas>
+
+      <!-- Guess section -->
+      <div id="guess-section">
+        <p style="font-size:15px;font-weight:600;margin-bottom:4px">Which frequency was affected?</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px" id="gain-hint"></p>
+        <div class="play-bar">
+          <button class="btn btn-sm" onclick="playProcessed()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>Play (B)
+          </button>
+          <button class="btn btn-sm" onclick="playReference()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Reference (A)
+          </button>
+          <button class="btn btn-sm" onclick="stopAudio()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg>Stop
+          </button>
+        </div>
+        <div class="freq-grid" id="freq-buttons"></div>
+        <div id="answer-panel" style="display:none">
+          <div class="result-box">
+            <div class="result-title" id="result-text"></div>
+            <div class="result-detail" id="result-detail"></div>
+            <div class="meter" style="margin-top:10px"><div class="meter-fill" id="acc-meter" style="width:0%"></div></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-primary" style="flex:1;padding:13px" onclick="startRound()">Next round</button>
+            <button class="btn" style="padding:13px 16px" onclick="showTab('home')">Home</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Correct section -->
+      <div id="correct-section" style="display:none">
+        <p style="font-size:15px;font-weight:600;margin-bottom:4px">Correct mode</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Adjust the EQ to match the reference.</p>
+        <div class="play-bar">
+          <button class="btn btn-sm" onclick="playProcessed()">Play modified</button>
+          <button class="btn btn-sm" onclick="playReference()">Play reference</button>
+          <button class="btn btn-sm" onclick="stopAudio()">Stop</button>
+        </div>
+        <div style="margin-bottom:6px;font-size:13px;color:var(--text2)">Frequency</div>
+        <select id="correct-freq-sel"></select>
+        <div style="margin-bottom:4px;font-size:13px;color:var(--text2)">Gain: <span id="correct-gain-disp" style="color:var(--text);font-weight:600">0</span> dB</div>
+        <input type="range" min="-15" max="15" value="0" step="1" id="correct-gain-sl" style="width:100%;accent-color:var(--accent);margin-bottom:14px" oninput="document.getElementById('correct-gain-disp').textContent=this.value">
+        <button class="btn btn-primary btn-block" style="padding:13px" onclick="submitCorrect()">Submit correction</button>
+        <div id="correct-answer" style="display:none">
+          <div class="result-box" style="margin-top:12px">
+            <div class="result-title" id="correct-result-text"></div>
+            <div class="result-detail" id="correct-result-detail"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-primary" style="flex:1;padding:13px" onclick="startRound()">Next round</button>
+            <button class="btn" style="padding:13px 16px" onclick="showTab('home')">Home</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="screen" id="screen-settings">
+      <div class="section-label">Training mode</div>
+      <div class="pill-group" style="margin-bottom:4px">
+        <button class="pill" id="mode-guess" onclick="setMode('guess')">Guess</button>
+        <button class="pill" id="mode-correct" onclick="setMode('correct')">Correct</button>
+      </div>
+
+      <div class="section-label">Difficulty</div>
+      <div class="pill-group" style="margin-bottom:4px">
+        <button class="pill" id="diff-beginner" onclick="setDiff('beginner')">Beginner</button>
+        <button class="pill" id="diff-intermediate" onclick="setDiff('intermediate')">Intermediate</button>
+        <button class="pill" id="diff-advanced" onclick="setDiff('advanced')">Advanced</button>
+      </div>
+
+      <div class="section-label">Q (bandwidth)</div>
+      <div class="card" style="padding:12px">
+        <div class="pill-group" style="margin-bottom:10px">
+          <button class="pill" id="qmode-fixed" onclick="setQMode('fixed')">Fixed</button>
+          <button class="pill" id="qmode-random" onclick="setQMode('random')">Random</button>
+          <button class="pill" id="qmode-guess" onclick="setQMode('guess')">Guess Q too</button>
+        </div>
+        <div id="q-fixed-row">
+          <div class="slider-row">
+            <label>Q</label>
+            <input type="range" min="1" max="120" value="14" step="1" id="q-sl" oninput="onQSlider(this.value)">
+            <span class="slider-val" id="q-disp">1.41</span>
+          </div>
+        </div>
+        <div id="q-range-row" style="display:none">
+          <div class="slider-row">
+            <label>Min</label>
+            <input type="range" min="1" max="120" value="1" step="1" id="q-min-sl" oninput="onQRangeSlider()">
+            <span class="slider-val" id="q-min-disp">0.10</span>
+          </div>
+          <div class="slider-row">
+            <label>Max</label>
+            <input type="range" min="1" max="120" value="120" step="1" id="q-max-sl" oninput="onQRangeSlider()">
+            <span class="slider-val" id="q-max-disp">12.00</span>
+          </div>
+        </div>
+        <div class="q-hint" id="q-hint">Q 1.41 — Wide, about 1–2 octaves, natural sound</div>
+      </div>
+
+      <div class="section-label">Timed mode</div>
+      <div class="card" style="padding:12px">
+        <div class="pill-group" style="margin-bottom:10px">
+          <button class="pill" id="timed-off" onclick="setTimed(false)">Off</button>
+          <button class="pill" id="timed-on" onclick="setTimed(true)">On</button>
+        </div>
+        <div class="slider-row">
+          <label>Secs</label>
+          <input type="range" min="5" max="30" value="10" step="1" id="timed-sl" oninput="document.getElementById('timed-secs').textContent=this.value">
+          <span class="slider-val" id="timed-secs">10</span>
+        </div>
+      </div>
+
+      <div class="section-label">Filter types</div>
+      <div class="pill-group" style="margin-bottom:4px">
+        <button class="pill" id="ftype-peaking" onclick="toggleFilter('peaking')">Bell</button>
+        <button class="pill" id="ftype-highshelf" onclick="toggleFilter('highshelf')">High shelf</button>
+        <button class="pill" id="ftype-lowshelf" onclick="toggleFilter('lowshelf')">Low shelf</button>
+        <button class="pill" id="ftype-highpass" onclick="toggleFilter('highpass')">High-pass</button>
+      </div>
+
+      <div class="section-label">Frequency bands</div>
+      <div class="freq-grid" id="band-toggles" style="margin-bottom:4px"></div>
+
+      <div class="section-label">Boost/cut gain range</div>
+      <div class="card" style="padding:12px">
+        <div class="slider-row">
+          <label>± dB</label>
+          <input type="range" min="3" max="15" value="9" step="1" id="gain-range-sl" oninput="document.getElementById('gain-range-disp').textContent=this.value">
+          <span class="slider-val" id="gain-range-disp">9</span>
+        </div>
+      </div>
+
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="screen" id="screen-progress">
+      <div class="section-label">Accuracy over time</div>
+      <div class="card" style="padding:12px">
+        <canvas id="prog-canvas" height="160"></canvas>
+      </div>
+      <div class="section-label">All-time stats</div>
+      <div class="stats-grid" style="margin-bottom:12px" id="alltime-stats"></div>
+      <div class="divider"></div>
+      <button class="btn btn-danger btn-block" onclick="resetProgress()" style="padding:12px">Reset all progress</button>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="screen" id="screen-history">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:15px;font-weight:600">Round history</div>
+        <button class="btn btn-sm" onclick="clearHistory()">Clear</button>
+      </div>
+      <div class="scroll-list" id="history-list"></div>
+      <div style="height:8px"></div>
+    </div>
+
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tabbar">
+    <button class="tab active" id="tab-home" onclick="showTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>
+      Home
+    </button>
+    <button class="tab" id="tab-quiz" onclick="showTab('quiz')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+      Train
+    </button>
+    <button class="tab" id="tab-progress" onclick="showTab('progress')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l4-4 4 4 4-8 4 4"/></svg>
+      Progress
+    </button>
+    <button class="tab" id="tab-history" onclick="showTab('history')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+      History
+    </button>
+    <button class="tab" id="tab-settings" onclick="showTab('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+      Settings
+    </button>
+  </div>
+</div>
+
+<script>
+const FREQS=[32,63,125,250,500,1000,2000,4000,8000,16000];
+const FREQ_LABELS=['32','63','125','250','500','1k','2k','4k','8k','16k'];
+const FILTER_TYPES=['peaking','highshelf','lowshelf','highpass'];
+const FILTER_LABELS={peaking:'Bell',highshelf:'Hi shelf',lowshelf:'Lo shelf',highpass:'Hi-pass'};
+
+let audioCtx,sourceNode,filterNode,gainNode;
+let timerInterval=null,timerLeft=10;
+
+let S={
+  mode:'guess',diff:'beginner',activeFreqs:[...FREQS],activeFilters:['peaking'],
+  gainRange:9,source:'pink',audioBuffer:null,
+  score:0,streak:0,total:0,correct:0,history:[],
+  currentFreq:0,currentGain:0,currentFilter:'peaking',currentQ:1.41,
+  qMode:'fixed',qFixed:1.41,qMin:0.1,qMax:12.0,
+  timed:false,timedSecs:10
+};
+
+// Storage
+function saveData(){try{localStorage.setItem('eqt',JSON.stringify({history:S.history,score:S.score,streak:S.streak,total:S.total,correct:S.correct}));}catch(e){}}
+function loadData(){try{const d=JSON.parse(localStorage.getItem('eqt')||'{}');S.history=d.history||[];S.score=d.score||0;S.streak=d.streak||0;S.total=d.total||0;S.correct=d.correct||0;updateStats();}catch(e){}}
+
+// Q helpers
+function sliderToQ(v){return parseFloat((v/10).toFixed(2));}
+function qToSlider(q){return Math.round(q*10);}
+function fmtQ(q){return parseFloat(q).toFixed(2);}
+function onQSlider(v){const q=sliderToQ(v);S.qFixed=q;document.getElementById('q-disp').textContent=fmtQ(q);updateQHint(q);}
+function onQRangeSlider(){
+  S.qMin=sliderToQ(document.getElementById('q-min-sl').value);
+  S.qMax=sliderToQ(document.getElementById('q-max-sl').value);
+  document.getElementById('q-min-disp').textContent=fmtQ(S.qMin);
+  document.getElementById('q-max-disp').textContent=fmtQ(S.qMax);
+}
+function updateQHint(q){
+  let h='';
+  if(q<=0.5)h='Very wide — gentle, musical';
+  else if(q<=1.5)h='Wide — ~1–2 octaves, natural';
+  else if(q<=4)h='Medium — focused, common in mixing';
+  else if(q<=8)h='Narrow — surgical, precise';
+  else h='Very narrow — almost notch-like';
+  document.getElementById('q-hint').textContent=`Q ${fmtQ(q)} — ${h}`;
+}
+function setQMode(m){
+  S.qMode=m;
+  ['fixed','random','guess'].forEach(k=>{
+    const el=document.getElementById('qmode-'+k);
+    el.className='pill'+(k===m?' active':'');
+  });
+  document.getElementById('q-fixed-row').style.display=m==='fixed'?'block':'none';
+  document.getElementById('q-range-row').style.display=m!=='fixed'?'block':'none';
+  if(m==='fixed')updateQHint(S.qFixed);
+  else document.getElementById('q-hint').textContent='Q chosen randomly each round within your range.';
+}
+function pickQ(){
+  if(S.qMode==='fixed')return S.qFixed;
+  const lo=Math.log(S.qMin),hi=Math.log(S.qMax);
+  return parseFloat(Math.exp(lo+Math.random()*(hi-lo)).toFixed(2));
+}
+
+// Audio
+function initAudio(){
+  if(audioCtx)return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  filterNode=audioCtx.createBiquadFilter();filterNode.type='peaking';filterNode.Q.value=1.41;
+  gainNode=audioCtx.createGain();gainNode.gain.value=0.75;
+  filterNode.connect(gainNode);gainNode.connect(audioCtx.destination);
+}
+function makeNoise(type){
+  const len=audioCtx.sampleRate*3,buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate),d=buf.getChannelData(0);
+  if(type==='white'){for(let i=0;i<len;i++)d[i]=Math.random()*2-1;}
+  else{let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;
+    for(let i=0;i<len;i++){const w=Math.random()*2-1;
+      b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.96900*b2+w*0.1538520;
+      b3=0.86650*b3+w*0.3104856;b4=0.55000*b4+w*0.5329522;b5=-0.7616*b5-w*0.0168980;
+      d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*.11;b6=w*0.115926;}}
+  return buf;
+}
+function stopAudio(){if(sourceNode){try{sourceNode.stop();}catch(e){}sourceNode=null;}clearTmr();}
+function playBuf(buf,withFilter){
+  stopAudio();if(!audioCtx||!buf)return;
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  sourceNode=audioCtx.createBufferSource();sourceNode.buffer=buf;sourceNode.loop=true;
+  sourceNode.connect(withFilter?filterNode:gainNode);sourceNode.start();
+}
+function getBuf(){
+  if(S.source==='white')return makeNoise('white');
+  if(S.source==='pink')return makeNoise('pink');
+  return S.audioBuffer;
+}
+function applyFilter(){
+  filterNode.type=S.currentFilter;
+  filterNode.frequency.value=S.currentFreq;
+  filterNode.Q.value=S.currentQ;
+  filterNode.gain.value=S.currentFilter==='highpass'?0:S.currentGain;
+}
+function playProcessed(){
+  initAudio();const b=getBuf();if(!b){alert('Load an audio file first.');return;}
+  applyFilter();playBuf(b,true);
+  if(S.timed&&document.getElementById('answer-panel').style.display==='none'&&document.getElementById('correct-answer').style.display==='none')startTimer();
+}
+function playReference(){initAudio();const b=getBuf();if(!b){alert('Load an audio file first.');return;}playBuf(b,false);}
+function setSource(s){
+  S.source=s;
+  document.getElementById('file-area').style.display=s==='file'?'block':'none';
+  document.getElementById('noise-note').style.display=s!=='file'?'block':'none';
+  if(s==='pink')document.getElementById('noise-note').textContent='Pink noise — great for beginners';
+  if(s==='white')document.getElementById('noise-note').textContent='White noise active';
+  ['pink','white','file'].forEach(k=>{document.getElementById('src-'+k).className='pill'+(k===s?' active':'');});
+}
+function loadFile(inp){
+  const file=inp.files[0];if(!file)return;initAudio();
+  const r=new FileReader();
+  r.onload=e=>{audioCtx.decodeAudioData(e.target.result,buf=>{S.audioBuffer=buf;document.getElementById('file-name').textContent=file.name;},()=>alert('Could not decode audio file.'));};
+  r.readAsArrayBuffer(file);
+}
+
+// Timer
+function startTimer(){clearTmr();timerLeft=S.timedSecs;updTimer();timerInterval=setInterval(()=>{timerLeft--;updTimer();if(timerLeft<=0){clearTmr();if(S.mode==='guess'&&document.getElementById('answer-panel').style.display==='none')timeOut();}},1000);}
+function clearTmr(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function updTimer(){
+  document.getElementById('timer-text').textContent=timerLeft;
+  const p=timerLeft/S.timedSecs;
+  document.getElementById('timer-arc').style.strokeDashoffset=(1-p)*75.4;
+  document.getElementById('timer-arc').style.stroke=p>0.4?'#3b82f6':'#ef4444';
+}
+function timeOut(){
+  stopAudio();S.total++;S.streak=0;S.score=Math.max(0,S.score-2);updateStats();drawEQ(true);
+  const fi=FREQS.indexOf(S.currentFreq);
+  document.querySelectorAll('.freq-btn').forEach(b=>{if(parseInt(b.dataset.freq)===S.currentFreq)b.className='freq-btn correct';});
+  document.getElementById('answer-panel').style.display='block';
+  document.getElementById('result-text').textContent="Time's up!";
+  document.getElementById('result-text').style.color='#ef4444';
+  document.getElementById('result-detail').textContent='Answer: '+FREQ_LABELS[fi]+' Hz · Q '+fmtQ(S.currentQ);
+  document.getElementById('acc-meter').style.width='0%';
+  document.getElementById('acc-meter').style.background='#ef4444';
+  S.history.unshift({mode:'guess',freq:FREQ_LABELS[fi],gain:S.currentGain,filter:S.currentFilter,q:S.currentQ,guess:'—',correct:false,acc:0,ts:Date.now()});
+  if(S.history.length>100)S.history.pop();saveData();
+}
+
+// EQ Curve
+function drawEQ(revealed){
+  const canvas=document.getElementById('eq-canvas');
+  const W=canvas.offsetWidth||window.innerWidth-32,H=120;
+  canvas.width=W;canvas.height=H;
+  const dc=canvas.getContext('2d');
+  dc.fillStyle='#1a1a1a';dc.fillRect(0,0,W,H);
+  const logMin=Math.log10(20),logMax=Math.log10(20000);
+  function fx(f){return((Math.log10(f)-logMin)/(logMax-logMin))*W;}
+  dc.strokeStyle='rgba(255,255,255,0.06)';dc.lineWidth=0.5;
+  dc.beginPath();dc.moveTo(0,H/2);dc.lineTo(W,H/2);dc.stroke();
+  FREQS.forEach((f,i)=>{
+    const x=fx(f);
+    dc.strokeStyle='rgba(255,255,255,0.05)';dc.lineWidth=0.5;
+    dc.beginPath();dc.moveTo(x,4);dc.lineTo(x,H-14);dc.stroke();
+    dc.fillStyle='rgba(255,255,255,0.3)';dc.font='10px -apple-system,sans-serif';dc.textAlign='center';
+    dc.fillText(FREQ_LABELS[i],x,H-3);
+  });
+  ['+12','+6','0','-6','-12'].forEach((l,i)=>{
+    const y=(H-20)*(i/4)+10;
+    dc.fillStyle='rgba(255,255,255,0.2)';dc.font='9px -apple-system,sans-serif';dc.textAlign='left';dc.fillText(l,2,y+3);
+  });
+  if(!revealed){
+    dc.fillStyle='rgba(255,255,255,0.2)';dc.font='13px -apple-system,sans-serif';dc.textAlign='center';
+    dc.fillText('EQ curve reveals after answering',W/2,H/2-4);return;
+  }
+  const ft=S.currentFilter,fc=S.currentFreq,g=S.currentGain,Q=S.currentQ,mG=15,pH=H-20,pT=10;
+  dc.beginPath();dc.strokeStyle='#3b82f6';dc.lineWidth=2.5;
+  for(let px=0;px<W;px++){
+    const f=Math.pow(10,logMin+(logMax-logMin)*(px/W));
+    let gv=0;
+    if(ft==='peaking'){const lr=Math.log2(f/fc),bw=1/Q;gv=g*Math.exp(-(lr*lr)/(2*bw*bw));}
+    else if(ft==='highshelf'){gv=g/(1+Math.exp(-Math.log2(f/fc)*Q*0.8));}
+    else if(ft==='lowshelf'){gv=g/(1+Math.exp(-Math.log2(fc/f)*Q*0.8));}
+    else if(ft==='highpass'){const r=fc/f;gv=r>1?-Math.min(40,Math.pow(r,2)*8):0;}
+    const y=pT+pH*(0.5-(gv/mG)*0.5);
+    px===0?dc.moveTo(px,y):dc.lineTo(px,y);
+  }
+  dc.stroke();
+  const cx=fx(fc),dotY=pT+pH*(0.5-(g/mG)*0.5);
+  dc.fillStyle='#3b82f6';dc.beginPath();dc.arc(cx,dotY,5,0,Math.PI*2);dc.fill();
+  const lbl=`${fc>=1000?fc/1000+'k':fc}Hz ${g>=0?'+':''}${g}dB Q${fmtQ(Q)}`;
+  dc.fillStyle='#60a5fa';dc.font='11px -apple-system,sans-serif';dc.textAlign='center';
+  dc.fillText(lbl,Math.min(Math.max(cx,55),W-55),dotY>pT+18?dotY-9:dotY+18);
+}
+
+// Round
+function startRound(){
+  initAudio();
+  if(S.source==='file'&&!S.audioBuffer){alert('Load an audio file first.');showTab('home');return;}
+  clearTmr();
+  const freqs=S.activeFreqs.length?S.activeFreqs:FREQS;
+  S.currentFreq=freqs[Math.floor(Math.random()*freqs.length)];
+  const filters=S.activeFilters.length?S.activeFilters:['peaking'];
+  S.currentFilter=filters[Math.floor(Math.random()*filters.length)];
+  S.currentQ=pickQ();
+  S.currentGain=S.currentFilter==='highpass'?0:((Math.random()>0.5?1:-1)*(S.gainRange*(0.6+Math.random()*0.4)))|0||S.gainRange;
+
+  showTab('quiz');
+  document.getElementById('answer-panel').style.display='none';
+  document.getElementById('correct-answer').style.display='none';
+  document.getElementById('timer-wrap').style.display=S.timed?'flex':'none';
+  document.getElementById('quiz-q-badge').textContent='Q '+fmtQ(S.currentQ);
+  document.getElementById('quiz-filter-badge').textContent=FILTER_LABELS[S.currentFilter]||S.currentFilter;
+  document.getElementById('quiz-mode-badge').textContent=S.mode==='guess'?'Guess mode':'Correct mode';
+
+  drawEQ(false);
+
+  if(S.mode==='guess'){
+    document.getElementById('guess-section').style.display='block';
+    document.getElementById('correct-section').style.display='none';
+    let hint='Filter: '+(FILTER_LABELS[S.currentFilter]||S.currentFilter);
+    if(S.currentFilter!=='highpass')hint+=' · '+(S.currentGain>0?'+':'')+S.currentGain+' dB';
+    if(S.qMode==='guess')hint+=' · Q hidden';
+    document.getElementById('gain-hint').textContent=hint;
+    renderFreqBtns();
+  } else {
+    document.getElementById('guess-section').style.display='none';
+    document.getElementById('correct-section').style.display='block';
+    renderCorrectSel();
+    document.getElementById('correct-gain-sl').value=0;
+    document.getElementById('correct-gain-disp').textContent='0';
+  }
+  playProcessed();
+  if(S.timed){timerLeft=S.timedSecs;updTimer();startTimer();}
+}
+
+function renderFreqBtns(){
+  const el=document.getElementById('freq-buttons');el.innerHTML='';
+  FREQS.forEach((f,i)=>{
+    if(!S.activeFreqs.includes(f))return;
+    const b=document.createElement('button');
+    b.className='freq-btn';b.textContent=FREQ_LABELS[i];b.dataset.freq=f;
+    b.onclick=()=>submitGuess(f);el.appendChild(b);
+  });
+}
+function renderCorrectSel(){
+  const sel=document.getElementById('correct-freq-sel');sel.innerHTML='';
+  FREQS.forEach((f,i)=>{
+    if(!S.activeFreqs.includes(f))return;
+    const o=document.createElement('option');o.value=f;o.textContent=FREQ_LABELS[i]+' Hz';sel.appendChild(o);
+  });
+}
+
+function submitGuess(gf){
+  clearTmr();stopAudio();drawEQ(true);
+  const ok=gf===S.currentFreq;
+  const idx=FREQS.indexOf(S.currentFreq),gi=FREQS.indexOf(gf);
+  const acc=ok?100:Math.max(0,100-Math.abs(idx-gi)*25);
+  S.total++;ok?(S.correct++,S.score+=10,S.streak++):(S.streak=0,S.score=Math.max(0,S.score-2));
+  updateStats();
+  document.querySelectorAll('.freq-btn').forEach(b=>{
+    const f=parseInt(b.dataset.freq);
+    if(f===S.currentFreq)b.className='freq-btn correct';
+    else if(f===gf&&!ok)b.className='freq-btn wrong';
+  });
+  document.getElementById('answer-panel').style.display='block';
+  document.getElementById('result-text').textContent=ok?'Correct!':'Answer: '+FREQ_LABELS[FREQS.indexOf(S.currentFreq)]+' Hz';
+  document.getElementById('result-text').style.color=ok?'#22c55e':'#ef4444';
+  document.getElementById('result-detail').textContent=ok
+    ?`${FILTER_LABELS[S.currentFilter]}, ${S.currentGain>0?'+':''}${S.currentGain} dB, Q ${fmtQ(S.currentQ)}`
+    :`You guessed ${FREQ_LABELS[gi]} Hz · Q was ${fmtQ(S.currentQ)}`;
+  const mf=document.getElementById('acc-meter');
+  mf.style.width=acc+'%';mf.style.background=acc>=80?'#22c55e':acc>=50?'#f59e0b':'#ef4444';
+  S.history.unshift({mode:'guess',freq:FREQ_LABELS[FREQS.indexOf(S.currentFreq)],gain:S.currentGain,filter:S.currentFilter,q:S.currentQ,guess:FREQ_LABELS[gi],correct:ok,acc:Math.round(acc),ts:Date.now()});
+  if(S.history.length>100)S.history.pop();saveData();
+}
+
+function submitCorrect(){
+  clearTmr();stopAudio();drawEQ(true);
+  const gf=parseInt(document.getElementById('correct-freq-sel').value);
+  const gg=parseInt(document.getElementById('correct-gain-sl').value);
+  const ok=gf===S.currentFreq&&Math.abs(gg-(-S.currentGain))<=2;
+  S.total++;ok?(S.correct++,S.score+=10,S.streak++):(S.streak=0,S.score=Math.max(0,S.score-2));
+  updateStats();
+  const fi=FREQS.indexOf(S.currentFreq);
+  document.getElementById('correct-answer').style.display='block';
+  document.getElementById('correct-result-text').textContent=ok?'Correct!':'Not quite';
+  document.getElementById('correct-result-text').style.color=ok?'#22c55e':'#ef4444';
+  document.getElementById('correct-result-detail').textContent=`Answer: ${FREQ_LABELS[fi]} Hz, ${S.currentGain>0?'+':''}${S.currentGain} dB, Q ${fmtQ(S.currentQ)}`;
+  S.history.unshift({mode:'correct',freq:FREQ_LABELS[fi],gain:S.currentGain,filter:S.currentFilter,q:S.currentQ,ok,acc:ok?100:0,ts:Date.now()});
+  if(S.history.length>100)S.history.pop();saveData();
+}
+
+function updateStats(){
+  document.getElementById('stat-score').textContent=S.score;
+  document.getElementById('stat-streak').textContent=S.streak;
+  document.getElementById('stat-acc').textContent=S.total>0?Math.round(S.correct/S.total*100)+'%':'—';
+}
+
+// Settings
+function setMode(m){S.mode=m;['guess','correct'].forEach(k=>{document.getElementById('mode-'+k).className='pill'+(k===m?' active':'');});}
+function setDiff(d){
+  S.diff=d;['beginner','intermediate','advanced'].forEach(k=>{document.getElementById('diff-'+k).className='pill'+(k===d?' active':'');});
+  S.gainRange={beginner:9,intermediate:6,advanced:3}[d];
+  document.getElementById('gain-range-sl').value=S.gainRange;document.getElementById('gain-range-disp').textContent=S.gainRange;
+}
+function setTimed(on){
+  S.timed=on;
+  document.getElementById('timed-on').className='pill'+(on?' active':'');
+  document.getElementById('timed-off').className='pill'+(!on?' active':'');
+}
+function toggleFilter(ft){
+  if(S.activeFilters.includes(ft)){if(S.activeFilters.length>1)S.activeFilters=S.activeFilters.filter(x=>x!==ft);}
+  else S.activeFilters.push(ft);
+  FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S.activeFilters.includes(k)?' active':'');});
+}
+function renderBandToggles(){
+  const el=document.getElementById('band-toggles');el.innerHTML='';
+  FREQS.forEach((f,i)=>{
+    const b=document.createElement('button');
+    b.className='freq-btn'+(S.activeFreqs.includes(f)?' selected':'');
+    b.textContent=FREQ_LABELS[i];b.dataset.freq=f;
+    b.onclick=()=>{
+      if(S.activeFreqs.includes(f)){if(S.activeFreqs.length>2)S.activeFreqs=S.activeFreqs.filter(x=>x!==f);}
+      else{S.activeFreqs.push(f);S.activeFreqs.sort((a,b)=>a-b);}
+      renderBandToggles();
+    };
+    el.appendChild(b);
+  });
+}
+
+// Progress chart
+function drawProgressChart(){
+  const canvas=document.getElementById('prog-canvas');
+  const W=canvas.offsetWidth||window.innerWidth-32,H=160;
+  canvas.width=W;canvas.height=H;
+  const dc=canvas.getContext('2d');dc.clearRect(0,0,W,H);
+  const pts=S.history.filter(h=>h.acc!=null).slice().reverse().slice(-30);
+  if(pts.length<2){
+    dc.fillStyle='rgba(255,255,255,0.2)';dc.font='13px -apple-system,sans-serif';dc.textAlign='center';
+    dc.fillText('Play at least 2 rounds to see progress',W/2,H/2);return;
+  }
+  const pad={l:30,r:10,t:12,b:22},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
+  [0,25,50,75,100].forEach(v=>{
+    const y=pad.t+iH*(1-v/100);
+    dc.strokeStyle='rgba(255,255,255,0.07)';dc.lineWidth=0.5;dc.beginPath();dc.moveTo(pad.l,y);dc.lineTo(W-pad.r,y);dc.stroke();
+    dc.fillStyle='rgba(255,255,255,0.25)';dc.font='9px -apple-system,sans-serif';dc.textAlign='right';dc.fillText(v+'%',pad.l-4,y+3);
+  });
+  const step=iW/(pts.length-1);
+  dc.beginPath();dc.strokeStyle='#3b82f6';dc.lineWidth=2;
+  pts.forEach((p,i)=>{const x=pad.l+i*step,y=pad.t+iH*(1-p.acc/100);i===0?dc.moveTo(x,y):dc.lineTo(x,y);});
+  dc.stroke();
+  pts.forEach((p,i)=>{
+    const x=pad.l+i*step,y=pad.t+iH*(1-p.acc/100);
+    dc.fillStyle=p.acc===100?'#22c55e':p.acc>=50?'#f59e0b':'#ef4444';
+    dc.beginPath();dc.arc(x,y,4,0,Math.PI*2);dc.fill();
+  });
+  const run=pts.map((_,i,a)=>{const sl=a.slice(Math.max(0,i-4),i+1);return sl.reduce((s,p)=>s+p.acc,0)/sl.length;});
+  dc.beginPath();dc.strokeStyle='rgba(167,139,250,0.7)';dc.lineWidth=1.5;dc.setLineDash([4,3]);
+  run.forEach((v,i)=>{const x=pad.l+i*step,y=pad.t+iH*(1-v/100);i===0?dc.moveTo(x,y):dc.lineTo(x,y);});
+  dc.stroke();dc.setLineDash([]);
+}
+function renderAllTimeStats(){
+  const best=S.history.length?Math.max(...S.history.map(h=>h.acc||0)):0;
+  const avg=S.total>0?Math.round(S.correct/S.total*100):0;
+  document.getElementById('alltime-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-val">${S.total}</div><div class="stat-label">Total rounds</div></div>
+    <div class="stat-card"><div class="stat-val">${best}%</div><div class="stat-label">Best acc.</div></div>
+    <div class="stat-card"><div class="stat-val">${avg}%</div><div class="stat-label">Overall acc.</div></div>`;
+}
+
+// History
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  if(!S.history.length){el.innerHTML='<p style="color:rgba(255,255,255,0.3);font-size:13px;text-align:center;padding:24px 0">No rounds played yet.</p>';return;}
+  el.innerHTML=S.history.map(h=>{
+    const fl=FILTER_LABELS[h.filter]||'Bell',ql=h.q?' Q'+fmtQ(h.q):'';
+    const badge=h.mode==='guess'
+      ?(h.correct?'<span class="badge badge-success">✓ Correct</span>':'<span class="badge badge-danger">✗ '+h.guess+'</span>')
+      :(h.ok?'<span class="badge badge-success">✓ Correct</span>':'<span class="badge badge-warn">~ Missed</span>');
+    return`<div class="hist-item"><div><div class="hist-freq">${h.freq} Hz${h.gain?(' '+(h.gain>0?'+':'')+h.gain+'dB'):''}</div><div class="hist-meta">${fl}${ql}</div></div>${badge}</div>`;
+  }).join('');
+}
+function clearHistory(){S.history=[];renderHistory();saveData();}
+function resetProgress(){
+  if(!confirm('Reset all progress?'))return;
+  S.history=[];S.score=0;S.streak=0;S.total=0;S.correct=0;
+  updateStats();localStorage.removeItem('eqt');showTab('home');
+}
+
+// Tab navigation
+function showTab(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  if(name==='history')renderHistory();
+  if(name==='settings'){
+    renderBandToggles();setMode(S.mode);setDiff(S.diff);setTimed(S.timed);setQMode(S.qMode);
+    FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S.activeFilters.includes(k)?' active':'');});
+    document.getElementById('q-sl').value=qToSlider(S.qFixed);document.getElementById('q-disp').textContent=fmtQ(S.qFixed);
+    document.getElementById('q-min-sl').value=qToSlider(S.qMin);document.getElementById('q-min-disp').textContent=fmtQ(S.qMin);
+    document.getElementById('q-max-sl').value=qToSlider(S.qMax);document.getElementById('q-max-disp').textContent=fmtQ(S.qMax);
+    updateQHint(S.qFixed);document.getElementById('gain-range-sl').value=S.gainRange;document.getElementById('gain-range-disp').textContent=S.gainRange;
+    document.getElementById('timed-sl').value=S.timedSecs;document.getElementById('timed-secs').textContent=S.timedSecs;
+  }
+  if(name==='progress')setTimeout(()=>{drawProgressChart();renderAllTimeStats();},50);
+  if(name!=='quiz')stopAudio();
+  // Update topbar
+  const titles={home:'EQ Ear Trainer',quiz:'Training',settings:'Settings',progress:'Progress',history:'History'};
+  const subs={home:`${S.mode==='guess'?'Guess':'Correct'} mode · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}`,quiz:'',settings:'',progress:'',history:''};
+  document.getElementById('topbar-title').textContent=titles[name]||'EQ Ear Trainer';
+  document.getElementById('topbar-sub').textContent=subs[name]||'';
+}
+
+// Init
+setSource('pink');setMode('guess');setDiff('beginner');setTimed(false);setQMode('fixed');
+FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S.activeFilters.includes(k)?' active':'');});
+loadData();
+
+// Service worker registration
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+}
+
+// Prevent scroll bounce on iOS
+document.body.addEventListener('touchmove',e=>{if(e.target.closest('.content'))return;e.preventDefault();},{passive:false});
+</script>
+</body>
+</html>
