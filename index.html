@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0f0f0f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Freqy">
+<link rel="manifest" href="manifest.json">
+<title>Freqy — EQ Ear Training</title>
+<style>
+:root{
+  --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2e2e2e;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --text:#f0f0f0;--text2:#999;--text3:#555;
+  --accent:#3b82f6;--accent-bg:rgba(59,130,246,0.15);
+  --success:#22c55e;--success-bg:rgba(34,197,94,0.15);
+  --danger:#ef4444;--danger-bg:rgba(239,68,68,0.15);
+  --warn:#f59e0b;--warn-bg:rgba(245,158,11,0.15);
+  --gold:#fbbf24;--gold-bg:rgba(251,191,36,0.15);
+  --purple:#a78bfa;--purple-bg:rgba(167,139,250,0.15);
+  --radius:14px;--radius-sm:9px;
+  --safe-top:env(safe-area-inset-top,0px);
+  --safe-bottom:env(safe-area-inset-bottom,0px);
+  --tabbar-h:70px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;}
+#app{height:100%;display:flex;flex-direction:column;padding-top:var(--safe-top);}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:0.5px solid var(--border);flex-shrink:0;}
+.topbar-title{font-size:17px;font-weight:700;letter-spacing:-0.5px;}
+.topbar-sub{font-size:11px;color:var(--text2);margin-top:1px;}
+.content{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 8px;}
+.screen{display:none;}.screen.active{display:block;}
+.card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:13px 14px;margin-bottom:11px;}
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.7px;color:var(--text3);margin:16px 0 8px;}
+.section-label:first-child{margin-top:0;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 16px;border:0.5px solid var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--text);font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;}
+.btn:active{opacity:0.7;transform:scale(0.97);}
+.btn-primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+.btn-sm{padding:7px 12px;font-size:13px;}
+.btn-block{width:100%;}
+.btn-danger{border-color:var(--danger);color:var(--danger);background:transparent;}
+.btn-gold{background:var(--gold);border-color:var(--gold);color:#000;}
+.pill-group{display:flex;gap:6px;flex-wrap:wrap;}
+.pill{padding:7px 14px;border:0.5px solid var(--border2);border-radius:20px;background:transparent;color:var(--text2);font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;}
+.pill:active{opacity:0.7;}
+.pill.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.stat-card{background:var(--bg3);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.stat-val{font-size:24px;font-weight:700;line-height:1;}
+.stat-label{font-size:11px;color:var(--text2);margin-top:4px;}
+.freq-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin:10px 0;}
+.freq-btn{padding:14px 4px;border:0.5px solid var(--border);border-radius:var(--radius-sm);background:var(--bg3);color:var(--text);font-size:13px;font-weight:500;cursor:pointer;text-align:center;font-family:inherit;}
+.freq-btn:active{opacity:0.7;transform:scale(0.96);}
+.freq-btn.correct{background:var(--success-bg);border-color:var(--success);color:var(--success);}
+.freq-btn.wrong{background:var(--danger-bg);border-color:var(--danger);color:var(--danger);}
+.freq-btn.selected{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.badge{display:inline-block;font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;}
+.badge-info{background:var(--accent-bg);color:var(--accent);}
+.badge-success{background:var(--success-bg);color:var(--success);}
+.badge-danger{background:var(--danger-bg);color:var(--danger);}
+.badge-warn{background:var(--warn-bg);color:var(--warn);}
+.badge-neutral{background:var(--bg3);color:var(--text2);}
+.badge-gold{background:var(--gold-bg);color:var(--gold);}
+.badge-purple{background:var(--purple-bg);color:var(--purple);}
+.meter{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin:8px 0;}
+.meter-fill{height:100%;border-radius:3px;transition:width 0.4s;}
+.result-box{background:var(--bg3);border-radius:var(--radius-sm);padding:14px;margin-top:12px;}
+.result-title{font-size:16px;font-weight:600;margin-bottom:4px;}
+.result-detail{font-size:13px;color:var(--text2);}
+.slider-row{display:flex;align-items:center;gap:10px;margin:6px 0;}
+.slider-row label{font-size:12px;color:var(--text2);min-width:32px;}
+.slider-row input[type=range]{flex:1;accent-color:var(--accent);}
+.slider-val{font-size:13px;font-weight:600;min-width:38px;text-align:right;color:var(--text);}
+select{width:100%;padding:10px 12px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:inherit;margin-bottom:10px;}
+.divider{height:0.5px;background:var(--border);margin:12px 0;}
+.start-btn{width:100%;padding:18px;background:var(--accent);border:none;border-radius:var(--radius);color:#fff;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-top:4px;}
+.start-btn:active{opacity:0.8;transform:scale(0.98);}
+#eq-canvas{width:100%;height:110px;display:block;border-radius:var(--radius-sm);background:var(--bg3);margin-bottom:12px;}
+#prog-canvas{width:100%;height:140px;display:block;}
+#heatmap-canvas{width:100%;height:100px;display:block;border-radius:var(--radius-sm);}
+.tabbar{display:flex;border-top:0.5px solid var(--border);padding-bottom:var(--safe-bottom);flex-shrink:0;background:var(--bg);height:var(--tabbar-h);}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:10px;color:var(--text3);cursor:pointer;border:none;background:none;font-family:inherit;padding:6px 2px;}
+.tab.active{color:var(--accent);}
+.tab svg{width:24px;height:24px;}
+.ab-bar{display:flex;gap:8px;margin-bottom:10px;}
+.ab-btn{flex:1;padding:13px 4px;border-radius:var(--radius-sm);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;border:1.5px solid var(--border2);background:var(--bg3);color:var(--text2);}
+.ab-btn.active-a{border-color:var(--success);color:var(--success);}
+.ab-btn.active-b{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.ab-btn:active{transform:scale(0.97);}
+#waveform-canvas{width:100%;height:52px;display:block;border-radius:var(--radius-sm);background:var(--bg3);cursor:pointer;margin-bottom:6px;touch-action:none;}
+.loop-info{font-size:11px;color:var(--text2);display:flex;justify-content:space-between;margin-bottom:10px;}
+.playlist-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:0.5px solid var(--border);cursor:pointer;}
+.playlist-item:last-child{border-bottom:none;}
+.playlist-item.active-track .track-name{color:var(--accent);}
+.track-name{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:220px;}
+.track-dur{font-size:12px;color:var(--text3);}
+.track-del{padding:6px 10px;border:none;background:none;color:var(--text3);font-size:18px;cursor:pointer;font-family:inherit;}
+.add-file-btn{display:flex;align-items:center;gap:10px;padding:13px 14px;background:var(--bg3);border:1.5px dashed var(--border2);border-radius:var(--radius-sm);cursor:pointer;color:var(--text2);font-size:14px;width:100%;font-family:inherit;}
+input[type=file]{display:none;}
+.now-playing{background:var(--bg3);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;display:flex;align-items:center;gap:10px;}
+.now-playing-info{flex:1;min-width:0;}
+.now-playing-name{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.now-playing-status{font-size:11px;color:var(--text2);margin-top:2px;}
+.playing-dot{width:8px;height:8px;border-radius:50%;background:var(--success);flex-shrink:0;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.q-hint{font-size:12px;color:var(--text3);margin-top:6px;font-style:italic;}
+
+/* XP / Level bar */
+.xp-bar-wrap{background:var(--bg3);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:11px;}
+.xp-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.level-badge{font-size:13px;font-weight:700;color:var(--gold);}
+.xp-num{font-size:12px;color:var(--text2);}
+.xp-bar{height:8px;background:var(--bg4);border-radius:4px;overflow:hidden;}
+.xp-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,#f59e0b,#fbbf24);transition:width 0.5s;}
+.streak-row{display:flex;align-items:center;gap:8px;margin-top:8px;}
+.streak-fire{font-size:18px;}
+.streak-text{font-size:13px;font-weight:600;color:var(--warn);}
+.streak-sub{font-size:11px;color:var(--text3);}
+
+/* Session timer */
+.session-timer-wrap{background:var(--bg3);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:11px;display:flex;align-items:center;justify-content:space-between;}
+.session-timer-time{font-size:22px;font-weight:700;font-variant-numeric:tabular-nums;}
+.session-timer-label{font-size:11px;color:var(--text2);margin-top:2px;}
+
+/* Heatmap */
+.heatmap-legend{display:flex;justify-content:space-between;font-size:10px;color:var(--text3);margin-top:4px;}
+
+/* Summary modal */
+.modal-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:100;padding:20px;}
+.modal{background:var(--bg2);border-radius:var(--radius);padding:22px;width:100%;max-width:340px;border:0.5px solid var(--border2);}
+.modal-title{font-size:18px;font-weight:700;margin-bottom:4px;}
+.modal-sub{font-size:13px;color:var(--text2);margin-bottom:16px;}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px;}
+.summary-item{background:var(--bg3);border-radius:var(--radius-sm);padding:12px;text-align:center;}
+.summary-val{font-size:22px;font-weight:700;}
+.summary-label{font-size:11px;color:var(--text2);margin-top:3px;}
+
+/* Pro badge */
+.pro-banner{background:linear-gradient(135deg,#1e1b4b,#312e81);border:1px solid #4f46e5;border-radius:var(--radius);padding:16px;margin-bottom:11px;text-align:center;}
+.pro-banner h3{font-size:16px;font-weight:700;color:#a5b4fc;margin-bottom:4px;}
+.pro-banner p{font-size:12px;color:#818cf8;margin-bottom:12px;}
+
+/* Preset chips */
+.preset-chip{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:20px;font-size:13px;cursor:pointer;font-family:inherit;color:var(--text);margin:4px 4px 4px 0;}
+.preset-chip.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent);}
+.preset-chip .del-chip{color:var(--text3);font-size:15px;line-height:1;}
+
+/* Blind mode indicator */
+.blind-mode-banner{background:var(--purple-bg);border:0.5px solid var(--purple);border-radius:var(--radius-sm);padding:8px 12px;font-size:12px;color:var(--purple);margin-bottom:10px;text-align:center;font-weight:500;}
+
+input[type=text]{width:100%;padding:10px 12px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:inherit;outline:none;}
+input[type=text]:focus{border-color:var(--accent);}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0"    y="0"    width="32" height="2.2" rx="1.1" fill="white"   opacity="1.00"/>
+        <rect x="1.5"  y="3"    width="29" height="2.2" rx="1.1" fill="white"   opacity="0.80"/>
+        <rect x="3"    y="6"    width="26" height="2.2" rx="1.1" fill="white"   opacity="0.60"/>
+        <rect x="4.5"  y="9"    width="23" height="2.2" rx="1.1" fill="white"   opacity="0.42"/>
+        <rect x="6"    y="12"   width="20" height="2.2" rx="1.1" fill="white"   opacity="0.28"/>
+        <rect x="7.5"  y="15"   width="17" height="2.2" rx="1.1" fill="white"   opacity="0.16"/>
+        <rect x="9"    y="18"   width="14" height="2.5" rx="1.25" fill="white"  opacity="0.08"/>
+        <rect x="7.5"  y="21"   width="17" height="2.2" rx="1.1" fill="#ef4444" opacity="0.16"/>
+        <rect x="6"    y="24"   width="20" height="2.2" rx="1.1" fill="#ef4444" opacity="0.28"/>
+        <rect x="4.5"  y="27"   width="23" height="2.2" rx="1.1" fill="#ef4444" opacity="0.42"/>
+        <rect x="3"    y="30"   width="26" height="2.2" rx="1.1" fill="#ef4444" opacity="0.60"/>
+        <rect x="1.5"  y="33"   width="29" height="2.2" rx="1.1" fill="#ef4444" opacity="0.80"/>
+        <rect x="0"    y="36"   width="32" height="2.2" rx="1.1" fill="#ef4444" opacity="1.00"/>
+      </svg>
+      <div>
+        <div class="topbar-title" id="topbar-title" style="font-size:18px;letter-spacing:-0.5px;">Freqy</div>
+        <div class="topbar-sub" id="topbar-sub">Guess mode · Beginner</div>
+      </div>
+    </div>
+    <div id="topbar-right" style="display:flex;align-items:center;gap:8px;">
+      <span class="badge badge-gold" id="level-badge-top">Lv 1</span>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- HOME -->
+    <div class="screen active" id="screen-home">
+      <!-- XP Bar -->
+      <div class="xp-bar-wrap">
+        <div class="xp-top">
+          <span class="level-badge" id="level-name">Beginner</span>
+          <span class="xp-num" id="xp-num">0 / 100 XP</span>
+        </div>
+        <div class="xp-bar"><div class="xp-fill" id="xp-fill" style="width:0%"></div></div>
+        <div class="streak-row">
+          <span class="streak-fire">🔥</span>
+          <div>
+            <div class="streak-text" id="streak-text">0 day streak</div>
+            <div class="streak-sub" id="streak-sub">Train today to start your streak!</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Session timer -->
+      <div class="session-timer-wrap" id="session-timer-wrap">
+        <div>
+          <div class="session-timer-time" id="session-timer-disp">00:00</div>
+          <div class="session-timer-label" id="session-timer-label">Session timer off</div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button class="btn btn-sm" id="session-start-btn" onclick="toggleSessionTimer()">Start</button>
+          <select id="session-dur-sel" style="width:90px;margin:0;padding:6px 8px;font-size:12px" onchange="onSessionDurChange()">
+            <option value="0">Free</option>
+            <option value="300">5 min</option>
+            <option value="600">10 min</option>
+            <option value="900">15 min</option>
+            <option value="1800">30 min</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Audio source -->
+      <div class="section-label">Audio source</div>
+      <div class="card" style="padding:12px">
+        <div class="pill-group" style="margin-bottom:10px">
+          <button class="pill active" id="src-pink" onclick="setSource('pink')">Pink noise</button>
+          <button class="pill" id="src-white" onclick="setSource('white')">White noise</button>
+          <button class="pill" id="src-file" onclick="setSource('file')">My files</button>
+        </div>
+        <div id="noise-note" style="font-size:12px;color:var(--text3)">Pink noise — great for beginners</div>
+        <div id="file-note" style="display:none;font-size:12px;color:var(--text3)">Using playlist — manage in Playlist tab</div>
+      </div>
+
+      <div id="now-playing-wrap" style="display:none">
+        <div class="now-playing">
+          <div class="playing-dot" id="playing-dot" style="background:var(--text3);animation:none"></div>
+          <div class="now-playing-info">
+            <div class="now-playing-name" id="now-playing-name">No track selected</div>
+            <div class="now-playing-status" id="now-playing-status">Tap a song in Playlist to load it</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats -->
+      <div class="section-label">Session stats</div>
+      <div class="stats-grid" style="margin-bottom:11px">
+        <div class="stat-card"><div class="stat-val" id="stat-score">0</div><div class="stat-label">Score</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-streak">0</div><div class="stat-label">Streak</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-acc">—</div><div class="stat-label">Accuracy</div></div>
+      </div>
+
+      <button class="start-btn" onclick="startRound()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+        Start training
+      </button>
+    </div>
+
+    <!-- QUIZ -->
+    <div class="screen" id="screen-quiz">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="display:flex;gap:5px;flex-wrap:wrap">
+          <span class="badge badge-info" id="quiz-mode-badge">Guess mode</span>
+          <span class="badge badge-neutral" id="quiz-q-badge">Q 1.41</span>
+          <span class="badge badge-neutral" id="quiz-filter-badge">Bell</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:13px;font-weight:600;color:var(--warn)" id="session-countdown-disp"></span>
+          <div style="display:none;align-items:center;gap:6px" id="timer-wrap">
+            <svg width="28" height="28" viewBox="0 0 28 28">
+              <circle cx="14" cy="14" r="11" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2.5"/>
+              <circle id="timer-arc" cx="14" cy="14" r="11" fill="none" stroke="#3b82f6" stroke-width="2.5" stroke-dasharray="69.1" stroke-dashoffset="0" stroke-linecap="round" transform="rotate(-90 14 14)" style="transition:stroke-dashoffset 1s linear"/>
+            </svg>
+            <span style="font-size:14px;font-weight:600;min-width:18px" id="timer-text">10</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="blind-mode-banner" id="blind-banner" style="display:none">Blind mode — no hints, trust your ears</div>
+
+      <canvas id="eq-canvas" height="110"></canvas>
+
+      <div id="loop-section" style="display:none;margin-bottom:10px">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">Loop region — drag handles</div>
+        <canvas id="waveform-canvas" height="52"></canvas>
+        <div class="loop-info">
+          <span id="loop-start-lbl">Start: 0.0s</span>
+          <span id="loop-len-lbl">Length: full</span>
+          <span id="loop-end-lbl">End: —</span>
+        </div>
+      </div>
+
+      <div class="ab-bar">
+        <button class="ab-btn active-a" id="btn-ref" onclick="setAB('A')">◉ Reference (A)</button>
+        <button class="ab-btn" id="btn-proc" onclick="setAB('B')">◈ EQ Applied (B)</button>
+      </div>
+      <div style="text-align:center;font-size:11px;color:var(--text3);margin-bottom:10px">Toggle A/B — audio never restarts</div>
+
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="btn btn-sm" style="flex:1" onclick="togglePlayStop()" id="play-stop-btn">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg> Play
+        </button>
+        <button class="btn btn-sm" onclick="stopAudio()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12"/></svg> Stop
+        </button>
+      </div>
+
+      <div id="guess-section">
+        <p style="font-size:15px;font-weight:600;margin-bottom:4px">Which frequency was affected?</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px" id="gain-hint"></p>
+        <div class="freq-grid" id="freq-buttons"></div>
+        <div id="answer-panel" style="display:none">
+          <div class="result-box">
+            <div class="result-title" id="result-text"></div>
+            <div class="result-detail" id="result-detail"></div>
+            <div class="meter" style="margin-top:10px"><div class="meter-fill" id="acc-meter" style="width:0%"></div></div>
+            <div style="font-size:12px;color:var(--gold);margin-top:8px;font-weight:600" id="xp-earned"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-primary" style="flex:1;padding:13px" onclick="startRound()">Next round</button>
+            <button class="btn" style="padding:13px 16px" onclick="showTab('home')">Home</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="correct-section" style="display:none">
+        <p style="font-size:15px;font-weight:600;margin-bottom:4px">Correct mode</p>
+        <p style="font-size:13px;color:var(--text2);margin-bottom:10px">Adjust the EQ to match reference (A).</p>
+        <div style="margin-bottom:6px;font-size:13px;color:var(--text2)">Frequency</div>
+        <select id="correct-freq-sel"></select>
+        <div style="margin-bottom:4px;font-size:13px;color:var(--text2)">Gain: <span id="correct-gain-disp" style="color:var(--text);font-weight:600">0</span> dB</div>
+        <input type="range" min="-15" max="15" value="0" step="1" id="correct-gain-sl" style="width:100%;accent-color:var(--accent);margin-bottom:14px" oninput="document.getElementById('correct-gain-disp').textContent=this.value">
+        <button class="btn btn-primary btn-block" style="padding:13px" onclick="submitCorrect()">Submit correction</button>
+        <div id="correct-answer" style="display:none">
+          <div class="result-box" style="margin-top:12px">
+            <div class="result-title" id="correct-result-text"></div>
+            <div class="result-detail" id="correct-result-detail"></div>
+            <div style="font-size:12px;color:var(--gold);margin-top:8px;font-weight:600" id="xp-earned-2"></div>
+          </div>
+          <div style="display:flex;gap:8px;margin-top:12px">
+            <button class="btn btn-primary" style="flex:1;padding:13px" onclick="startRound()">Next round</button>
+            <button class="btn" style="padding:13px 16px" onclick="showTab('home')">Home</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PLAYLIST -->
+    <div class="screen" id="screen-playlist">
+      <button class="add-file-btn" onclick="document.getElementById('file-input').click()">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        Add audio files
+      </button>
+      <input type="file" id="file-input" accept=".mp3,.wav,.ogg,.aac,.m4a,audio/*" multiple onchange="addFilesToPlaylist(this)">
+      <div style="margin-top:12px" id="playlist-list"></div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="screen" id="screen-progress">
+      <div class="section-label">Accuracy over time</div>
+      <div class="card" style="padding:12px"><canvas id="prog-canvas" height="140"></canvas></div>
+
+      <div class="section-label">Frequency weakness heatmap</div>
+      <div class="card" style="padding:12px">
+        <canvas id="heatmap-canvas" height="100"></canvas>
+        <div class="heatmap-legend">
+          <span>32Hz</span><span>125Hz</span><span>500Hz</span><span>2kHz</span><span>8kHz</span><span>16kHz</span>
+        </div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">Red = struggle zone · Green = strong · Gray = not enough data</div>
+      </div>
+
+      <div class="section-label">All-time stats</div>
+      <div class="stats-grid" style="margin-bottom:12px" id="alltime-stats"></div>
+
+      <div class="divider"></div>
+      <button class="btn btn-danger btn-block" onclick="resetProgress()" style="padding:12px">Reset all progress</button>
+      <div style="height:8px"></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="screen" id="screen-settings">
+      <!-- Pro banner -->
+      <div class="pro-banner">
+        <h3>⭐ Freqy Pro</h3>
+        <p>Unlock unlimited rounds, all filter types, custom presets and more</p>
+        <button class="btn btn-gold btn-block" style="padding:11px;font-size:14px" onclick="showProModal()">Upgrade — $1.99/month</button>
+      </div>
+
+      <div class="section-label">Training mode</div>
+      <div class="pill-group" style="margin-bottom:4px">
+        <button class="pill" id="mode-guess" onclick="setMode('guess')">Guess</button>
+        <button class="pill" id="mode-correct" onclick="setMode('correct')">Correct</button>
+        <button class="pill" id="mode-blind" onclick="setMode('blind')">Blind</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;margin-bottom:4px">Blind mode: no gain or filter hint — pure ear training</div>
+
+      <div class="section-label">Difficulty</div>
+      <div class="pill-group" style="margin-bottom:4px">
+        <button class="pill" id="diff-beginner" onclick="setDiff('beginner')">Beginner</button>
+        <button class="pill" id="diff-intermediate" onclick="setDiff('intermediate')">Intermediate</button>
+        <button class="pill" id="diff-advanced" onclick="setDiff('advanced')">Advanced</button>
+      </div>
+
+      <div class="section-label">Frequency presets</div>
+      <div id="preset-chips" style="margin-bottom:8px"></div>
+      <div style="display:flex;gap:8px;margin-bottom:4px">
+        <input type="text" id="preset-name-inp" placeholder="Preset name e.g. Low end focus" style="flex:1">
+        <button class="btn btn-sm" onclick="savePreset()">Save</button>
+      </div>
+
+      <div class="section-label">Q (bandwidth)</div>
+      <div class="card" style="padding:12px">
+        <div class="pill-group" style="margin-bottom:10px">
+          <button class="pill" id="qmode-fixed" onclick="setQMode('fixed')">Fixed</button>
+          <button class="pill" id="qmode-random" onclick="setQMode('random')">Random</button>
+          <button class="pill" id="qmode-guess" onclick="setQMode('guess')">Guess Q too</button>
+        </div>
+        <div id="q-fixed-row">
+          <div class="slider-row"><label>Q</label><input type="range" min="1" max="120" value="14" step="1" id="q-sl" oninput="onQSlider(this.value)"><span class="slider-val" id="q-disp">1.41</span></div>
+        </div>
+        <div id="q-range-row" style="display:none">
+          <div class="slider-row"><label>Min</label><input type="range" min="1" max="120" value="1" step="1" id="q-min-sl" oninput="onQRangeSlider()"><span class="slider-val" id="q-min-disp">0.10</span></div>
+          <div class="slider-row"><label>Max</label><input type="range" min="1" max="120" value="120" step="1" id="q-max-sl" oninput="onQRangeSlider()"><span class="slider-val" id="q-max-disp">12.00</span></div>
+        </div>
+        <div class="q-hint" id="q-hint">Q 1.41 — Wide, about 1–2 octaves, natural sound</div>
+      </div>
+
+      <div class="section-label">Timed mode</div>
+      <div class="card" style="padding:12px">
+        <div class="pill-group" style="margin-bottom:10px">
+          <button class="pill" id="timed-off" onclick="setTimed(false)">Off</button>
+          <button class="pill" id="timed-on" onclick="setTimed(true)">On</button>
+        </div>
+        <div class="slider-row"><label>Secs</label><input type="range" min="5" max="30" value="10" step="1" id="timed-sl" oninput="document.getElementById('timed-secs').textContent=this.value"><span class="slider-val" id="timed-secs">10</span></div>
+      </div>
+
+      <div class="section-label">Filter types</div>
+      <div class="pill-group" style="margin-bottom:4px">
+        <button class="pill" id="ftype-peaking" onclick="toggleFilter('peaking')">Bell</button>
+        <button class="pill" id="ftype-highshelf" onclick="toggleFilter('highshelf')">High shelf</button>
+        <button class="pill" id="ftype-lowshelf" onclick="toggleFilter('lowshelf')">Low shelf</button>
+        <button class="pill" id="ftype-highpass" onclick="toggleFilter('highpass')">High-pass</button>
+      </div>
+
+      <div class="section-label">Frequency bands</div>
+      <div class="freq-grid" id="band-toggles" style="margin-bottom:4px"></div>
+
+      <div class="section-label">Boost/cut gain range</div>
+      <div class="card" style="padding:12px">
+        <div class="slider-row"><label>± dB</label><input type="range" min="3" max="15" value="9" step="1" id="gain-range-sl" oninput="document.getElementById('gain-range-disp').textContent=this.value"><span class="slider-val" id="gain-range-disp">9</span></div>
+      </div>
+      <div style="height:8px"></div>
+    </div>
+
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tabbar">
+    <button class="tab active" id="tab-home" onclick="showTab('home')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9.5L12 3l9 6.5V20a1 1 0 01-1 1H4a1 1 0 01-1-1V9.5z"/><path d="M9 21V12h6v9"/></svg>Home
+    </button>
+    <button class="tab" id="tab-quiz" onclick="showTab('quiz')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>Train
+    </button>
+    <button class="tab" id="tab-playlist" onclick="showTab('playlist')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 6h18M3 12h18M3 18h12"/><circle cx="19" cy="18" r="2"/><path d="M21 10v8"/></svg>Playlist
+    </button>
+    <button class="tab" id="tab-progress" onclick="showTab('progress')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 17l4-4 4 4 4-8 4 4"/></svg>Progress
+    </button>
+    <button class="tab" id="tab-settings" onclick="showTab('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M2 12h2M20 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>Settings
+    </button>
+  </div>
+
+  <!-- Session summary modal -->
+  <div class="modal-overlay" id="summary-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-title">Session complete!</div>
+      <div class="modal-sub" id="summary-sub">Great work</div>
+      <div class="summary-grid" id="summary-grid"></div>
+      <div style="font-size:13px;color:var(--gold);font-weight:600;margin-bottom:14px" id="summary-xp"></div>
+      <button class="btn btn-primary btn-block" style="padding:13px" onclick="closeSummary()">Continue training</button>
+    </div>
+  </div>
+
+  <!-- Pro modal -->
+  <div class="modal-overlay" id="pro-modal" style="display:none">
+    <div class="modal">
+      <div class="modal-title">⭐ EQ Trainer Pro</div>
+      <div class="modal-sub">Everything you need to train like a pro</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6">
+        ✓ Unlimited daily rounds<br>
+        ✓ All filter types unlocked<br>
+        ✓ Custom frequency presets<br>
+        ✓ Blind test mode<br>
+        ✓ Advanced progress analytics<br>
+        ✓ Priority support
+      </div>
+      <button class="btn btn-gold btn-block" style="padding:13px;margin-bottom:8px" onclick="closePro()">Subscribe — $1.99/month</button>
+      <button class="btn btn-block" style="padding:11px;font-size:13px" onclick="closePro()">Maybe later</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const FREQS=[32,63,125,250,500,1000,2000,4000,8000,16000];
+const FREQ_LABELS=['32','63','125','250','500','1k','2k','4k','8k','16k'];
+const FILTER_TYPES=['peaking','highshelf','lowshelf','highpass'];
+const FILTER_LABELS={peaking:'Bell',highshelf:'Hi shelf',lowshelf:'Lo shelf',highpass:'Hi-pass'};
+
+// XP Levels
+const LEVELS=[
+  {name:'Beginner',xp:0},{name:'Learner',xp:100},{name:'Trainee',xp:250},
+  {name:'Engineer',xp:500},{name:'Mixer',xp:900},{name:'Pro',xp:1500},
+  {name:'Expert',xp:2500},{name:'Master',xp:4000},{name:'Golden Ears',xp:6000}
+];
+
+let audioCtx,sourceNode,filterNode,gainNode,dryGainNode,wetGainNode;
+let timerInterval=null,timerLeft=10;
+let isPlaying=false,abMode='A';
+let playlist=[];
+let currentTrackIdx=-1;
+let loopStart=0,loopEnd=null;
+let isDraggingLoop=false,dragHandle=null;
+
+// Session timer
+let sessionDuration=0,sessionElapsed=0,sessionInterval=null,sessionActive=false;
+let sessionRounds=0,sessionCorrect=0,sessionXP=0;
+
+let S={
+  mode:'guess',diff:'beginner',activeFreqs:[...FREQS],activeFilters:['peaking'],
+  gainRange:9,source:'pink',score:0,streak:0,total:0,correct:0,history:[],
+  currentFreq:0,currentGain:0,currentFilter:'peaking',currentQ:1.41,
+  qMode:'fixed',qFixed:1.41,qMin:0.1,qMax:12.0,timed:false,timedSecs:10,
+  xp:0,dailyStreak:0,lastTrainDate:'',presets:[],
+  freqStats:{} // {freq: {attempts, correct}}
+};
+
+// ---------- PERSISTENCE ----------
+function saveAll(){
+  try{
+    const d={
+      score:S.score,streak:S.streak,total:S.total,correct:S.correct,
+      history:S.history.slice(0,100),xp:S.xp,dailyStreak:S.dailyStreak,
+      lastTrainDate:S.lastTrainDate,presets:S.presets,freqStats:S.freqStats,
+      mode:S.mode,diff:S.diff,activeFreqs:S.activeFreqs,activeFilters:S.activeFilters,
+      gainRange:S.gainRange,source:S.source,qMode:S.qMode,qFixed:S.qFixed,
+      qMin:S.qMin,qMax:S.qMax,timed:S.timed,timedSecs:S.timedSecs,
+      playlistNames:playlist.map(p=>p.name)
+    };
+    localStorage.setItem('eqt3',JSON.stringify(d));
+  }catch(e){}
+}
+function loadAll(){
+  try{
+    const d=JSON.parse(localStorage.getItem('eqt3')||'{}');
+    Object.assign(S,{
+      score:d.score||0,streak:d.streak||0,total:d.total||0,correct:d.correct||0,
+      history:d.history||[],xp:d.xp||0,dailyStreak:d.dailyStreak||0,
+      lastTrainDate:d.lastTrainDate||'',presets:d.presets||[],
+      freqStats:d.freqStats||{},
+      mode:d.mode||'guess',diff:d.diff||'beginner',
+      activeFreqs:d.activeFreqs||[...FREQS],
+      activeFilters:d.activeFilters||['peaking'],
+      gainRange:d.gainRange||9,source:d.source||'pink',
+      qMode:d.qMode||'fixed',qFixed:d.qFixed||1.41,
+      qMin:d.qMin||0.1,qMax:d.qMax||12.0,
+      timed:d.timed||false,timedSecs:d.timedSecs||10
+    });
+    // restore playlist names (audio buffers can't be persisted — user re-adds files)
+    if(d.playlistNames&&d.playlistNames.length){
+      const note=document.getElementById('now-playing-status');
+      if(note)note.textContent='Re-add your files in Playlist tab';
+    }
+    updateStats();updateXPBar();updateStreakUI();renderPresetChips();
+  }catch(e){}
+}
+
+// ---------- XP & LEVELS ----------
+function addXP(amount){
+  S.xp+=amount;
+  updateXPBar();
+  saveAll();
+}
+function getLevel(){
+  let lvl=LEVELS[0],idx=0;
+  for(let i=0;i<LEVELS.length;i++){if(S.xp>=LEVELS[i].xp){lvl=LEVELS[i];idx=i;}}
+  const next=LEVELS[idx+1];
+  const pct=next?Math.round((S.xp-lvl.xp)/(next.xp-lvl.xp)*100):100;
+  return{...lvl,idx,next,pct};
+}
+function updateXPBar(){
+  const lv=getLevel();
+  document.getElementById('level-name').textContent=lv.name;
+  document.getElementById('xp-num').textContent=`${S.xp} / ${lv.next?lv.next.xp:'MAX'} XP`;
+  document.getElementById('xp-fill').style.width=lv.pct+'%';
+  document.getElementById('level-badge-top').textContent='Lv '+(lv.idx+1);
+}
+function updateStreakUI(){
+  const today=new Date().toDateString();
+  if(S.lastTrainDate&&S.lastTrainDate!==today){
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    if(S.lastTrainDate!==yesterday)S.dailyStreak=0;
+  }
+  document.getElementById('streak-text').textContent=S.dailyStreak+' day streak';
+  document.getElementById('streak-sub').textContent=S.dailyStreak>0?'Keep it up! Train again tomorrow':'Train today to start your streak!';
+}
+function markTrainedToday(){
+  const today=new Date().toDateString();
+  if(S.lastTrainDate!==today){
+    const yesterday=new Date(Date.now()-86400000).toDateString();
+    if(S.lastTrainDate===yesterday)S.dailyStreak++;
+    else S.dailyStreak=1;
+    S.lastTrainDate=today;
+    updateStreakUI();
+  }
+}
+
+// ---------- SESSION TIMER ----------
+function toggleSessionTimer(){
+  if(sessionActive){endSession();return;}
+  sessionDuration=parseInt(document.getElementById('session-dur-sel').value);
+  sessionElapsed=0;sessionRounds=0;sessionCorrect=0;sessionXP=0;
+  sessionActive=true;
+  document.getElementById('session-start-btn').textContent='End';
+  sessionInterval=setInterval(()=>{
+    sessionElapsed++;
+    updateSessionDisplay();
+    if(sessionDuration>0&&sessionElapsed>=sessionDuration){endSession();}
+  },1000);
+}
+function onSessionDurChange(){if(!sessionActive)updateSessionDisplay();}
+function updateSessionDisplay(){
+  const el=document.getElementById('session-timer-disp');
+  const lbl=document.getElementById('session-timer-label');
+  if(sessionActive){
+    const rem=sessionDuration>0?sessionDuration-sessionElapsed:sessionElapsed;
+    const m=Math.floor(rem/60),s=rem%60;
+    el.textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+    lbl.textContent=sessionDuration>0?'remaining':'elapsed';
+    const cd=document.getElementById('session-countdown-disp');
+    if(cd&&sessionDuration>0){const r=sessionDuration-sessionElapsed;const mm=Math.floor(r/60),ss=r%60;cd.textContent=`${mm}:${String(ss).padStart(2,'0')}`;}
+  } else {
+    el.textContent='00:00';lbl.textContent='Session timer off';
+    const cd=document.getElementById('session-countdown-disp');if(cd)cd.textContent='';
+  }
+}
+function endSession(){
+  if(!sessionActive)return;
+  sessionActive=false;
+  if(sessionInterval){clearInterval(sessionInterval);sessionInterval=null;}
+  document.getElementById('session-start-btn').textContent='Start';
+  showSummary();
+}
+function showSummary(){
+  const acc=sessionRounds>0?Math.round(sessionCorrect/sessionRounds*100):0;
+  const m=Math.floor(sessionElapsed/60),s=sessionElapsed%60;
+  document.getElementById('summary-sub').textContent='Here\'s how you did';
+  document.getElementById('summary-grid').innerHTML=`
+    <div class="summary-item"><div class="summary-val">${sessionRounds}</div><div class="summary-label">Rounds</div></div>
+    <div class="summary-item"><div class="summary-val">${acc}%</div><div class="summary-label">Accuracy</div></div>
+    <div class="summary-item"><div class="summary-val">${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}</div><div class="summary-label">Time</div></div>
+    <div class="summary-item"><div class="summary-val">${sessionXP}</div><div class="summary-label">XP earned</div></div>`;
+  document.getElementById('summary-xp').textContent=`+${sessionXP} XP earned this session`;
+  document.getElementById('summary-modal').style.display='flex';
+  updateSessionDisplay();
+}
+function closeSummary(){document.getElementById('summary-modal').style.display='none';}
+function showProModal(){document.getElementById('pro-modal').style.display='flex';}
+function closePro(){document.getElementById('pro-modal').style.display='none';}
+
+// ---------- FREQ PRESETS ----------
+function savePreset(){
+  const name=document.getElementById('preset-name-inp').value.trim();
+  if(!name)return;
+  S.presets.push({name,freqs:[...S.activeFreqs]});
+  document.getElementById('preset-name-inp').value='';
+  renderPresetChips();saveAll();
+}
+function loadPreset(idx){
+  S.activeFreqs=[...S.presets[idx].freqs];
+  renderBandToggles();renderPresetChips();
+}
+function deletePreset(idx,e){
+  e.stopPropagation();S.presets.splice(idx,1);renderPresetChips();saveAll();
+}
+function renderPresetChips(){
+  const el=document.getElementById('preset-chips');
+  if(!S.presets.length){el.innerHTML='<div style="font-size:12px;color:var(--text3)">No presets saved yet</div>';return;}
+  el.innerHTML=S.presets.map((p,i)=>`
+    <button class="preset-chip" onclick="loadPreset(${i})">
+      ${p.name}
+      <span class="del-chip" onclick="deletePreset(${i},event)">✕</span>
+    </button>`).join('');
+}
+
+// ---------- Q HELPERS ----------
+function sliderToQ(v){return parseFloat((v/10).toFixed(2));}
+function qToSlider(q){return Math.round(q*10);}
+function fmtQ(q){return parseFloat(q).toFixed(2);}
+function onQSlider(v){const q=sliderToQ(v);S.qFixed=q;document.getElementById('q-disp').textContent=fmtQ(q);updateQHint(q);}
+function onQRangeSlider(){S.qMin=sliderToQ(document.getElementById('q-min-sl').value);S.qMax=sliderToQ(document.getElementById('q-max-sl').value);document.getElementById('q-min-disp').textContent=fmtQ(S.qMin);document.getElementById('q-max-disp').textContent=fmtQ(S.qMax);}
+function updateQHint(q){let h='';if(q<=0.5)h='Very wide — gentle';else if(q<=1.5)h='Wide — ~1–2 octaves';else if(q<=4)h='Medium — focused';else if(q<=8)h='Narrow — surgical';else h='Very narrow — notch-like';document.getElementById('q-hint').textContent=`Q ${fmtQ(q)} — ${h}`;}
+function setQMode(m){S.qMode=m;['fixed','random','guess'].forEach(k=>{document.getElementById('qmode-'+k).className='pill'+(k===m?' active':'');});document.getElementById('q-fixed-row').style.display=m==='fixed'?'block':'none';document.getElementById('q-range-row').style.display=m!=='fixed'?'block':'none';if(m==='fixed')updateQHint(S.qFixed);else document.getElementById('q-hint').textContent='Q chosen randomly each round.';}
+function pickQ(){if(S.qMode==='fixed')return S.qFixed;const lo=Math.log(S.qMin),hi=Math.log(S.qMax);return parseFloat(Math.exp(lo+Math.random()*(hi-lo)).toFixed(2));}
+
+// ---------- AUDIO ----------
+function initAudio(){
+  if(audioCtx)return;
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  filterNode=audioCtx.createBiquadFilter();filterNode.type='peaking';filterNode.Q.value=1.41;
+  dryGainNode=audioCtx.createGain();dryGainNode.gain.value=1;
+  wetGainNode=audioCtx.createGain();wetGainNode.gain.value=0;
+  gainNode=audioCtx.createGain();gainNode.gain.value=0.75;
+  filterNode.connect(wetGainNode);wetGainNode.connect(gainNode);
+  dryGainNode.connect(gainNode);gainNode.connect(audioCtx.destination);
+}
+function makeNoise(type){
+  const len=audioCtx.sampleRate*3,buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate),d=buf.getChannelData(0);
+  if(type==='white'){for(let i=0;i<len;i++)d[i]=Math.random()*2-1;}
+  else{let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;for(let i=0;i<len;i++){const w=Math.random()*2-1;b0=0.99886*b0+w*0.0555179;b1=0.99332*b1+w*0.0750759;b2=0.96900*b2+w*0.1538520;b3=0.86650*b3+w*0.3104856;b4=0.55000*b4+w*0.5329522;b5=-0.7616*b5-w*0.0168980;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*0.5362)*.11;b6=w*0.115926;}}
+  return buf;
+}
+function stopAudio(){if(sourceNode){try{sourceNode.stop();}catch(e){}sourceNode=null;}isPlaying=false;clearTmr();updatePlayBtn();setPlayingDot(false);}
+function getBuffer(){if(S.source==='white')return makeNoise('white');if(S.source==='pink')return makeNoise('pink');if(currentTrackIdx>=0&&playlist[currentTrackIdx])return playlist[currentTrackIdx].buffer;return null;}
+function applyFilter(){filterNode.type=S.currentFilter;filterNode.frequency.value=S.currentFreq;filterNode.Q.value=S.currentQ;filterNode.gain.value=S.currentFilter==='highpass'?0:S.currentGain;}
+function setAB(mode){
+  abMode=mode;if(!audioCtx)return;
+  const isB=mode==='B';
+  dryGainNode.gain.setTargetAtTime(isB?0:1,audioCtx.currentTime,0.01);
+  wetGainNode.gain.setTargetAtTime(isB?1:0,audioCtx.currentTime,0.01);
+  document.getElementById('btn-ref').className='ab-btn'+(mode==='A'?' active-a':'');
+  document.getElementById('btn-proc').className='ab-btn'+(mode==='B'?' active-b':'');
+}
+function startPlayback(){
+  initAudio();const buf=getBuffer();if(!buf){if(S.source==='file')alert('Add a file in Playlist tab first.');return;}
+  if(audioCtx.state==='suspended')audioCtx.resume();
+  if(sourceNode){try{sourceNode.stop();}catch(e){}}
+  sourceNode=audioCtx.createBufferSource();sourceNode.buffer=buf;sourceNode.loop=true;
+  const dur=buf.duration,ls=loopStart||0,le=loopEnd&&loopEnd<dur?loopEnd:dur;
+  if(le>ls+0.1){sourceNode.loopStart=ls;sourceNode.loopEnd=le;}
+  sourceNode.connect(filterNode);sourceNode.connect(dryGainNode);
+  sourceNode.start(0,ls);isPlaying=true;applyFilter();setAB(abMode);updatePlayBtn();setPlayingDot(true);
+  sourceNode.onended=()=>{isPlaying=false;updatePlayBtn();setPlayingDot(false);};
+}
+function togglePlayStop(){if(isPlaying)stopAudio();else startPlayback();}
+function updatePlayBtn(){const btn=document.getElementById('play-stop-btn');if(!btn)return;btn.innerHTML=isPlaying?'<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg> Pause':'<svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg> Play';}
+function setPlayingDot(on){const d=document.getElementById('playing-dot');if(!d)return;d.style.background=on?'var(--success)':'var(--text3)';d.style.animation=on?'pulse 1.2s infinite':'none';}
+
+// ---------- PLAYLIST ----------
+function addFilesToPlaylist(inp){
+  const files=Array.from(inp.files);if(!files.length)return;initAudio();
+  let loaded=0;
+  files.forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=e=>{
+      audioCtx.decodeAudioData(e.target.result,buf=>{
+        playlist.push({name:file.name.replace(/\.[^.]+$/,''),buffer:buf,duration:buf.duration});
+        loaded++;if(loaded===files.length){renderPlaylist();saveAll();}
+      },()=>{loaded++;if(loaded===files.length)renderPlaylist();});
+    };
+    reader.readAsArrayBuffer(file);
+  });
+  inp.value='';
+}
+function loadTrack(idx){
+  currentTrackIdx=idx;loopStart=0;loopEnd=null;
+  const track=playlist[idx];
+  document.getElementById('now-playing-name').textContent=track.name;
+  document.getElementById('now-playing-status').textContent=`${fmtDur(track.duration)} · tap Play to start`;
+  document.getElementById('now-playing-wrap').style.display='block';
+  S.source='file';setSource('file');renderPlaylist();drawWaveform();
+}
+function removeTrack(idx,e){
+  e.stopPropagation();
+  if(currentTrackIdx===idx){stopAudio();currentTrackIdx=-1;document.getElementById('now-playing-wrap').style.display='none';}
+  else if(currentTrackIdx>idx)currentTrackIdx--;
+  playlist.splice(idx,1);renderPlaylist();saveAll();
+}
+function renderPlaylist(){
+  const el=document.getElementById('playlist-list');
+  if(!playlist.length){el.innerHTML='<p style="font-size:13px;color:var(--text3);text-align:center;padding:24px 0">No files yet — tap above to add songs</p>';return;}
+  el.innerHTML=playlist.map((t,i)=>`
+    <div class="playlist-item${i===currentTrackIdx?' active-track':''}" onclick="loadTrack(${i})">
+      <div><div class="track-name">${t.name}</div><div class="track-dur">${fmtDur(t.duration)}</div></div>
+      <button class="track-del" onclick="removeTrack(${i},event)">✕</button>
+    </div>`).join('');
+}
+function fmtDur(s){const m=Math.floor(s/60),sec=Math.floor(s%60);return`${m}:${sec<10?'0':''}${sec}`;}
+
+// ---------- WAVEFORM & LOOP ----------
+function drawWaveform(){
+  const canvas=document.getElementById('waveform-canvas');if(!canvas)return;
+  const W=canvas.offsetWidth||360,H=52;canvas.width=W;canvas.height=H;
+  const dc=canvas.getContext('2d');dc.fillStyle='#1a1a1a';dc.fillRect(0,0,W,H);
+  if(currentTrackIdx<0||!playlist[currentTrackIdx])return;
+  const buf=playlist[currentTrackIdx].buffer,dur=buf.duration,data=buf.getChannelData(0),step=Math.ceil(data.length/W);
+  dc.fillStyle='rgba(59,130,246,0.4)';
+  for(let x=0;x<W;x++){let max=0;for(let i=0;i<step;i++){const v=Math.abs(data[x*step+i]||0);if(v>max)max=v;}const h=max*(H-4);dc.fillRect(x,H/2-h/2,1,h);}
+  const ls=(loopStart/dur)*W,le=loopEnd?(loopEnd/dur)*W:W;
+  dc.fillStyle='rgba(59,130,246,0.2)';dc.fillRect(ls,0,le-ls,H);
+  dc.fillStyle='#3b82f6';dc.fillRect(ls-2,0,4,H);
+  dc.fillStyle='#22c55e';dc.fillRect(le-2,0,4,H);
+  dc.fillStyle='rgba(255,255,255,0.5)';dc.font='10px -apple-system,sans-serif';
+  dc.fillText(fmtDur(loopStart),ls+4,12);
+  if(loopEnd)dc.fillText(fmtDur(loopEnd),Math.max(le-40,0),12);
+  document.getElementById('loop-start-lbl').textContent='Start: '+fmtDur(loopStart);
+  document.getElementById('loop-end-lbl').textContent=loopEnd?'End: '+fmtDur(loopEnd):'End: —';
+  const len=loopEnd?(loopEnd-loopStart):(dur);
+  document.getElementById('loop-len-lbl').textContent='Length: '+fmtDur(len);
+}
+function setupWaveformTouch(){
+  const canvas=document.getElementById('waveform-canvas');if(!canvas)return;
+  function getPos(e){const r=canvas.getBoundingClientRect(),cx=(e.touches?e.touches[0].clientX:e.clientX);return(cx-r.left)/r.width;}
+  function onStart(e){if(currentTrackIdx<0)return;e.preventDefault();const p=getPos(e),dur=playlist[currentTrackIdx].buffer.duration,ls=loopStart/dur,le=(loopEnd||dur)/dur;isDraggingLoop=true;dragHandle=Math.abs(p-ls)<Math.abs(p-le)?'start':'end';}
+  function onMove(e){if(!isDraggingLoop)return;e.preventDefault();const p=Math.max(0,Math.min(1,getPos(e))),dur=playlist[currentTrackIdx].buffer.duration;if(dragHandle==='start'){loopStart=Math.min(p*dur,(loopEnd||dur)-0.5);}else{loopEnd=Math.max(p*dur,loopStart+0.5);if(loopEnd>=dur-0.05)loopEnd=null;}drawWaveform();if(isPlaying)startPlayback();}
+  function onEnd(){isDraggingLoop=false;}
+  canvas.addEventListener('touchstart',onStart,{passive:false});canvas.addEventListener('touchmove',onMove,{passive:false});canvas.addEventListener('touchend',onEnd);
+  canvas.addEventListener('mousedown',onStart);canvas.addEventListener('mousemove',onMove);canvas.addEventListener('mouseup',onEnd);
+}
+
+// ---------- EQ CURVE ----------
+function drawEQ(revealed){
+  const canvas=document.getElementById('eq-canvas');const W=canvas.offsetWidth||window.innerWidth-28,H=110;canvas.width=W;canvas.height=H;
+  const dc=canvas.getContext('2d');dc.fillStyle='#1a1a1a';dc.fillRect(0,0,W,H);
+  const logMin=Math.log10(20),logMax=Math.log10(20000);
+  function fx(f){return((Math.log10(f)-logMin)/(logMax-logMin))*W;}
+  dc.strokeStyle='rgba(255,255,255,0.06)';dc.lineWidth=0.5;dc.beginPath();dc.moveTo(0,H/2);dc.lineTo(W,H/2);dc.stroke();
+  FREQS.forEach((f,i)=>{const x=fx(f);dc.strokeStyle='rgba(255,255,255,0.05)';dc.lineWidth=0.5;dc.beginPath();dc.moveTo(x,4);dc.lineTo(x,H-14);dc.stroke();dc.fillStyle='rgba(255,255,255,0.3)';dc.font='10px -apple-system,sans-serif';dc.textAlign='center';dc.fillText(FREQ_LABELS[i],x,H-3);});
+  ['+12','+6','0','-6','-12'].forEach((l,i)=>{const y=(H-20)*(i/4)+10;dc.fillStyle='rgba(255,255,255,0.2)';dc.font='9px -apple-system,sans-serif';dc.textAlign='left';dc.fillText(l,2,y+3);});
+  if(!revealed){dc.fillStyle='rgba(255,255,255,0.2)';dc.font='13px -apple-system,sans-serif';dc.textAlign='center';dc.fillText('EQ curve reveals after answering',W/2,H/2-4);return;}
+  const ft=S.currentFilter,fc=S.currentFreq,g=S.currentGain,Q=S.currentQ,mG=15,pH=H-20,pT=10;
+  dc.beginPath();dc.strokeStyle='#3b82f6';dc.lineWidth=2.5;
+  for(let px=0;px<W;px++){const f=Math.pow(10,logMin+(logMax-logMin)*(px/W));let gv=0;if(ft==='peaking'){const lr=Math.log2(f/fc),bw=1/Q;gv=g*Math.exp(-(lr*lr)/(2*bw*bw));}else if(ft==='highshelf'){gv=g/(1+Math.exp(-Math.log2(f/fc)*Q*0.8));}else if(ft==='lowshelf'){gv=g/(1+Math.exp(-Math.log2(fc/f)*Q*0.8));}else if(ft==='highpass'){const r=fc/f;gv=r>1?-Math.min(40,Math.pow(r,2)*8):0;}const y=pT+pH*(0.5-(gv/mG)*0.5);px===0?dc.moveTo(px,y):dc.lineTo(px,y);}
+  dc.stroke();
+  const cx=fx(fc),dotY=pT+pH*(0.5-(g/mG)*0.5);
+  dc.fillStyle='#3b82f6';dc.beginPath();dc.arc(cx,dotY,5,0,Math.PI*2);dc.fill();
+  const lbl=`${fc>=1000?fc/1000+'k':fc}Hz ${g>=0?'+':''}${g}dB Q${fmtQ(Q)}`;
+  dc.fillStyle='#60a5fa';dc.font='11px -apple-system,sans-serif';dc.textAlign='center';dc.fillText(lbl,Math.min(Math.max(cx,55),W-55),dotY>pT+18?dotY-9:dotY+18);
+}
+
+// ---------- HEATMAP ----------
+function drawHeatmap(){
+  const canvas=document.getElementById('heatmap-canvas');if(!canvas)return;
+  const W=canvas.offsetWidth||window.innerWidth-28,H=100;canvas.width=W;canvas.height=H;
+  const dc=canvas.getContext('2d');dc.fillStyle='#1a1a1a';dc.fillRect(0,0,W,H);
+  const bw=Math.floor(W/FREQS.length),pad=4;
+  FREQS.forEach((f,i)=>{
+    const key=String(f),stat=S.freqStats[key];
+    let color='#333';let pct=0;
+    if(stat&&stat.attempts>=3){
+      pct=stat.correct/stat.attempts;
+      const r=Math.round(255*(1-pct)),g=Math.round(180*pct);
+      color=`rgb(${r},${g},30)`;
+    }
+    const x=i*bw+pad/2,w=bw-pad,barH=H-30;
+    dc.fillStyle=color;dc.beginPath();dc.roundRect(x,10,w,barH,4);dc.fill();
+    if(stat&&stat.attempts>=3){
+      dc.fillStyle='rgba(255,255,255,0.7)';dc.font='10px -apple-system,sans-serif';dc.textAlign='center';
+      dc.fillText(Math.round(pct*100)+'%',x+w/2,10+barH/2+4);
+    }
+    dc.fillStyle='rgba(255,255,255,0.4)';dc.font='9px -apple-system,sans-serif';dc.textAlign='center';
+    dc.fillText(FREQ_LABELS[i],x+w/2,H-6);
+  });
+}
+
+// ---------- ROUND ----------
+function startRound(){
+  initAudio();
+  if(S.source==='file'&&(currentTrackIdx<0||!playlist[currentTrackIdx])){alert('Add a file in Playlist tab and tap it to load it.');showTab('playlist');return;}
+  clearTmr();
+  const freqs=S.activeFreqs.length?S.activeFreqs:FREQS;
+  S.currentFreq=freqs[Math.floor(Math.random()*freqs.length)];
+  const filters=S.activeFilters.length?S.activeFilters:['peaking'];
+  S.currentFilter=filters[Math.floor(Math.random()*filters.length)];
+  S.currentQ=pickQ();
+  S.currentGain=S.currentFilter==='highpass'?0:((Math.random()>0.5?1:-1)*(S.gainRange*(0.6+Math.random()*0.4)))|0||S.gainRange;
+
+  showTab('quiz');
+  document.getElementById('answer-panel').style.display='none';
+  document.getElementById('correct-answer').style.display='none';
+  document.getElementById('timer-wrap').style.display=S.timed?'flex':'none';
+  document.getElementById('quiz-q-badge').textContent='Q '+fmtQ(S.currentQ);
+  document.getElementById('quiz-filter-badge').textContent=FILTER_LABELS[S.currentFilter]||S.currentFilter;
+  document.getElementById('quiz-mode-badge').textContent=S.mode==='guess'?'Guess mode':S.mode==='blind'?'Blind mode':'Correct mode';
+  document.getElementById('loop-section').style.display=S.source==='file'?'block':'none';
+  document.getElementById('blind-banner').style.display=S.mode==='blind'?'block':'none';
+
+  drawEQ(false);
+  if(S.source==='file')drawWaveform();
+
+  abMode='A';setAB('A');applyFilter();startPlayback();
+  markTrainedToday();
+
+  if(S.mode==='guess'||S.mode==='blind'){
+    document.getElementById('guess-section').style.display='block';
+    document.getElementById('correct-section').style.display='none';
+    if(S.mode==='blind'){
+      document.getElementById('gain-hint').textContent='No hints — identify the frequency by ear only';
+    } else {
+      let hint='Filter: '+(FILTER_LABELS[S.currentFilter]||S.currentFilter);
+      if(S.currentFilter!=='highpass')hint+=' · '+(S.currentGain>0?'+':'')+S.currentGain+' dB';
+      if(S.qMode==='guess')hint+=' · Q hidden';
+      document.getElementById('gain-hint').textContent=hint;
+    }
+    renderFreqBtns();
+  } else {
+    document.getElementById('guess-section').style.display='none';
+    document.getElementById('correct-section').style.display='block';
+    renderCorrectSel();
+    document.getElementById('correct-gain-sl').value=0;
+    document.getElementById('correct-gain-disp').textContent='0';
+  }
+  if(S.timed){timerLeft=S.timedSecs;updTimer();startTimer();}
+}
+
+function renderFreqBtns(){const el=document.getElementById('freq-buttons');el.innerHTML='';FREQS.forEach((f,i)=>{if(!S.activeFreqs.includes(f))return;const b=document.createElement('button');b.className='freq-btn';b.textContent=FREQ_LABELS[i];b.dataset.freq=f;b.onclick=()=>submitGuess(f);el.appendChild(b);});}
+function renderCorrectSel(){const sel=document.getElementById('correct-freq-sel');sel.innerHTML='';FREQS.forEach((f,i)=>{if(!S.activeFreqs.includes(f))return;const o=document.createElement('option');o.value=f;o.textContent=FREQ_LABELS[i]+' Hz';sel.appendChild(o);});}
+
+function recordFreqStat(freq,correct){
+  const key=String(freq);
+  if(!S.freqStats[key])S.freqStats[key]={attempts:0,correct:0};
+  S.freqStats[key].attempts++;
+  if(correct)S.freqStats[key].correct++;
+}
+
+function submitGuess(gf){
+  clearTmr();drawEQ(true);
+  const ok=gf===S.currentFreq;
+  const idx=FREQS.indexOf(S.currentFreq),gi=FREQS.indexOf(gf);
+  const acc=ok?100:Math.max(0,100-Math.abs(idx-gi)*25);
+  const xpEarned=ok?10:Math.max(1,Math.round(acc/20));
+  S.total++;ok?(S.correct++,S.score+=10,S.streak++):(S.streak=0,S.score=Math.max(0,S.score-2));
+  addXP(xpEarned);recordFreqStat(S.currentFreq,ok);
+  sessionRounds++;if(ok)sessionCorrect++;sessionXP+=xpEarned;
+  updateStats();
+  document.querySelectorAll('.freq-btn').forEach(b=>{const f=parseInt(b.dataset.freq);if(f===S.currentFreq)b.className='freq-btn correct';else if(f===gf&&!ok)b.className='freq-btn wrong';});
+  document.getElementById('answer-panel').style.display='block';
+  document.getElementById('result-text').textContent=ok?'Correct!':'Answer: '+FREQ_LABELS[FREQS.indexOf(S.currentFreq)]+' Hz';
+  document.getElementById('result-text').style.color=ok?'#22c55e':'#ef4444';
+  document.getElementById('result-detail').textContent=ok?`${FILTER_LABELS[S.currentFilter]}, ${S.currentGain>0?'+':''}${S.currentGain} dB, Q ${fmtQ(S.currentQ)}`:`You guessed ${FREQ_LABELS[gi]} Hz · Q was ${fmtQ(S.currentQ)}`;
+  document.getElementById('xp-earned').textContent=`+${xpEarned} XP`;
+  const mf=document.getElementById('acc-meter');mf.style.width=acc+'%';mf.style.background=acc>=80?'#22c55e':acc>=50?'#f59e0b':'#ef4444';
+  S.history.unshift({mode:S.mode,freq:FREQ_LABELS[FREQS.indexOf(S.currentFreq)],gain:S.currentGain,filter:S.currentFilter,q:S.currentQ,guess:FREQ_LABELS[gi],correct:ok,acc:Math.round(acc),ts:Date.now()});
+  if(S.history.length>100)S.history.pop();saveAll();
+}
+
+function submitCorrect(){
+  clearTmr();drawEQ(true);
+  const gf=parseInt(document.getElementById('correct-freq-sel').value);
+  const gg=parseInt(document.getElementById('correct-gain-sl').value);
+  const ok=gf===S.currentFreq&&Math.abs(gg-(-S.currentGain))<=2;
+  const xpEarned=ok?12:2;
+  S.total++;ok?(S.correct++,S.score+=10,S.streak++):(S.streak=0,S.score=Math.max(0,S.score-2));
+  addXP(xpEarned);recordFreqStat(S.currentFreq,ok);
+  sessionRounds++;if(ok)sessionCorrect++;sessionXP+=xpEarned;
+  updateStats();
+  const fi=FREQS.indexOf(S.currentFreq);
+  document.getElementById('correct-answer').style.display='block';
+  document.getElementById('correct-result-text').textContent=ok?'Correct!':'Not quite';
+  document.getElementById('correct-result-text').style.color=ok?'#22c55e':'#ef4444';
+  document.getElementById('correct-result-detail').textContent=`Answer: ${FREQ_LABELS[fi]} Hz, ${S.currentGain>0?'+':''}${S.currentGain} dB, Q ${fmtQ(S.currentQ)}`;
+  document.getElementById('xp-earned-2').textContent=`+${xpEarned} XP`;
+  S.history.unshift({mode:'correct',freq:FREQ_LABELS[fi],gain:S.currentGain,filter:S.currentFilter,q:S.currentQ,ok,acc:ok?100:0,ts:Date.now()});
+  if(S.history.length>100)S.history.pop();saveAll();
+}
+
+// ---------- TIMER ----------
+function startTimer(){clearTmr();timerInterval=setInterval(()=>{timerLeft--;updTimer();if(timerLeft<=0){clearTmr();if((S.mode==='guess'||S.mode==='blind')&&document.getElementById('answer-panel').style.display==='none')timeOut();}},1000);}
+function clearTmr(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+function updTimer(){document.getElementById('timer-text').textContent=timerLeft;const p=timerLeft/S.timedSecs;document.getElementById('timer-arc').style.strokeDashoffset=(1-p)*69.1;document.getElementById('timer-arc').style.stroke=p>0.4?'#3b82f6':'#ef4444';}
+function timeOut(){
+  drawEQ(true);const fi=FREQS.indexOf(S.currentFreq);
+  document.querySelectorAll('.freq-btn').forEach(b=>{if(parseInt(b.dataset.freq)===S.currentFreq)b.className='freq-btn correct';});
+  document.getElementById('answer-panel').style.display='block';
+  document.getElementById('result-text').textContent="Time's up!";document.getElementById('result-text').style.color='#ef4444';
+  document.getElementById('result-detail').textContent='Answer: '+FREQ_LABELS[fi]+' Hz · Q '+fmtQ(S.currentQ);
+  document.getElementById('acc-meter').style.width='0%';document.getElementById('acc-meter').style.background='#ef4444';
+  document.getElementById('xp-earned').textContent='+1 XP';
+  S.total++;S.streak=0;S.score=Math.max(0,S.score-2);addXP(1);recordFreqStat(S.currentFreq,false);
+  sessionRounds++;sessionXP+=1;updateStats();
+  S.history.unshift({mode:S.mode,freq:FREQ_LABELS[fi],gain:S.currentGain,filter:S.currentFilter,q:S.currentQ,guess:'—',correct:false,acc:0,ts:Date.now()});
+  if(S.history.length>100)S.history.pop();saveAll();
+}
+
+function updateStats(){
+  document.getElementById('stat-score').textContent=S.score;
+  document.getElementById('stat-streak').textContent=S.streak;
+  document.getElementById('stat-acc').textContent=S.total>0?Math.round(S.correct/S.total*100)+'%':'—';
+}
+
+// ---------- SETTINGS ----------
+function setSource(s){S.source=s;['pink','white','file'].forEach(k=>{document.getElementById('src-'+k).className='pill'+(k===s?' active':'');});document.getElementById('noise-note').style.display=s!=='file'?'block':'none';document.getElementById('file-note').style.display=s==='file'?'block':'none';document.getElementById('now-playing-wrap').style.display=s==='file'?'block':'none';}
+function setMode(m){S.mode=m;['guess','correct','blind'].forEach(k=>{document.getElementById('mode-'+k).className='pill'+(k===m?' active':'');});}
+function setDiff(d){S.diff=d;['beginner','intermediate','advanced'].forEach(k=>{document.getElementById('diff-'+k).className='pill'+(k===d?' active':'');});S.gainRange={beginner:9,intermediate:6,advanced:3}[d];document.getElementById('gain-range-sl').value=S.gainRange;document.getElementById('gain-range-disp').textContent=S.gainRange;}
+function setTimed(on){S.timed=on;document.getElementById('timed-on').className='pill'+(on?' active':'');document.getElementById('timed-off').className='pill'+(!on?' active':'');}
+function toggleFilter(ft){if(S.activeFilters.includes(ft)){if(S.activeFilters.length>1)S.activeFilters=S.activeFilters.filter(x=>x!==ft);}else S.activeFilters.push(ft);FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S.activeFilters.includes(k)?' active':'');});}
+function renderBandToggles(){const el=document.getElementById('band-toggles');el.innerHTML='';FREQS.forEach((f,i)=>{const b=document.createElement('button');b.className='freq-btn'+(S.activeFreqs.includes(f)?' selected':'');b.textContent=FREQ_LABELS[i];b.dataset.freq=f;b.onclick=()=>{if(S.activeFreqs.includes(f)){if(S.activeFreqs.length>2)S.activeFreqs=S.activeFreqs.filter(x=>x!==f);}else{S.activeFreqs.push(f);S.activeFreqs.sort((a,b)=>a-b);}renderBandToggles();};el.appendChild(b);});}
+
+// ---------- PROGRESS CHART ----------
+function drawProgressChart(){
+  const canvas=document.getElementById('prog-canvas');const W=canvas.offsetWidth||window.innerWidth-28,H=140;canvas.width=W;canvas.height=H;const dc=canvas.getContext('2d');dc.clearRect(0,0,W,H);
+  const pts=S.history.filter(h=>h.acc!=null).slice().reverse().slice(-30);
+  if(pts.length<2){dc.fillStyle='rgba(255,255,255,0.2)';dc.font='13px -apple-system,sans-serif';dc.textAlign='center';dc.fillText('Play at least 2 rounds to see progress',W/2,H/2);return;}
+  const pad={l:30,r:10,t:12,b:22},iW=W-pad.l-pad.r,iH=H-pad.t-pad.b;
+  [0,25,50,75,100].forEach(v=>{const y=pad.t+iH*(1-v/100);dc.strokeStyle='rgba(255,255,255,0.07)';dc.lineWidth=0.5;dc.beginPath();dc.moveTo(pad.l,y);dc.lineTo(W-pad.r,y);dc.stroke();dc.fillStyle='rgba(255,255,255,0.25)';dc.font='9px -apple-system,sans-serif';dc.textAlign='right';dc.fillText(v+'%',pad.l-4,y+3);});
+  const step=iW/(pts.length-1);
+  dc.beginPath();dc.strokeStyle='#3b82f6';dc.lineWidth=2;pts.forEach((p,i)=>{const x=pad.l+i*step,y=pad.t+iH*(1-p.acc/100);i===0?dc.moveTo(x,y):dc.lineTo(x,y);});dc.stroke();
+  pts.forEach((p,i)=>{const x=pad.l+i*step,y=pad.t+iH*(1-p.acc/100);dc.fillStyle=p.acc===100?'#22c55e':p.acc>=50?'#f59e0b':'#ef4444';dc.beginPath();dc.arc(x,y,4,0,Math.PI*2);dc.fill();});
+  const run=pts.map((_,i,a)=>{const sl=a.slice(Math.max(0,i-4),i+1);return sl.reduce((s,p)=>s+p.acc,0)/sl.length;});
+  dc.beginPath();dc.strokeStyle='rgba(167,139,250,0.7)';dc.lineWidth=1.5;dc.setLineDash([4,3]);run.forEach((v,i)=>{const x=pad.l+i*step,y=pad.t+iH*(1-v/100);i===0?dc.moveTo(x,y):dc.lineTo(x,y);});dc.stroke();dc.setLineDash([]);
+}
+function renderAllTimeStats(){
+  const best=S.history.length?Math.max(...S.history.map(h=>h.acc||0)):0;
+  const avg=S.total>0?Math.round(S.correct/S.total*100):0;
+  const lv=getLevel();
+  document.getElementById('alltime-stats').innerHTML=`<div class="stat-card"><div class="stat-val">${S.total}</div><div class="stat-label">Total rounds</div></div><div class="stat-card"><div class="stat-val">${best}%</div><div class="stat-label">Best acc.</div></div><div class="stat-card"><div class="stat-val" style="color:var(--gold)">${S.xp}</div><div class="stat-label">Total XP</div></div>`;
+}
+function resetProgress(){if(!confirm('Reset all progress?'))return;S.history=[];S.score=0;S.streak=0;S.total=0;S.correct=0;S.xp=0;S.dailyStreak=0;S.freqStats={};updateStats();updateXPBar();updateStreakUI();localStorage.removeItem('eqt3');showTab('home');}
+
+// ---------- TAB NAV ----------
+function showTab(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+  const titles={home:'Freqy',quiz:'Training',playlist:'Playlist',progress:'Progress',settings:'Settings'};
+  const subs={home:`${S.mode==='blind'?'Blind':S.mode==='guess'?'Guess':'Correct'} mode · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}`,quiz:'',playlist:'',progress:'',settings:''};
+  document.getElementById('topbar-title').textContent=titles[name]||'Freqy';
+  document.getElementById('topbar-sub').textContent=subs[name]||'';
+  if(name==='settings'){renderBandToggles();setMode(S.mode);setDiff(S.diff);setTimed(S.timed);setQMode(S.qMode);FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S.activeFilters.includes(k)?' active':'');});document.getElementById('q-sl').value=qToSlider(S.qFixed);document.getElementById('q-disp').textContent=fmtQ(S.qFixed);document.getElementById('q-min-sl').value=qToSlider(S.qMin);document.getElementById('q-min-disp').textContent=fmtQ(S.qMin);document.getElementById('q-max-sl').value=qToSlider(S.qMax);document.getElementById('q-max-disp').textContent=fmtQ(S.qMax);updateQHint(S.qFixed);document.getElementById('gain-range-sl').value=S.gainRange;document.getElementById('gain-range-disp').textContent=S.gainRange;document.getElementById('timed-sl').value=S.timedSecs;document.getElementById('timed-secs').textContent=S.timedSecs;renderPresetChips();}
+  if(name==='progress')setTimeout(()=>{drawProgressChart();renderAllTimeStats();drawHeatmap();},50);
+  if(name==='playlist')renderPlaylist();
+  if(name!=='quiz')clearTmr();
+}
+
+// ---------- INIT ----------
+setSource('pink');setMode('guess');setDiff('beginner');setTimed(false);setQMode('fixed');
+FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S.activeFilters.includes(k)?' active':'');});
+loadAll();
+setTimeout(setupWaveformTouch,500);
+if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
+document.body.addEventListener('touchmove',e=>{if(e.target.closest('.content'))return;e.preventDefault();},{passive:false});
+</script>
+</body>
+</html>
