@@ -1,11 +1,11 @@
 {
-  "name": "Freqy — EQ Ear Training",
-  "short_name": "Freqy",
+  "name": "EQ Ear Trainer",
+  "short_name": "EQ Trainer",
   "description": "Train your ears to identify frequencies like a pro audio engineer",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#080808",
-  "theme_color": "#080808",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
   "orientation": "portrait",
   "icons": [
     {
