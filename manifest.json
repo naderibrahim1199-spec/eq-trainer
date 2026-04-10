@@ -1,25 +1,29 @@
 {
-  "name": "EQ Ear Trainer",
-  "short_name": "EQ Trainer",
+  "name": "Freqy \u2014 EQ Ear Training",
+  "short_name": "Freqy",
   "description": "Train your ears to identify frequencies like a pro audio engineer",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0f0f0f",
-  "theme_color": "#0f0f0f",
+  "background_color": "#080808",
+  "theme_color": "#080808",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "icons/icon-192.png",
+      "src": "icons/freqy-icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "icons/icon-512.png",
+      "src": "icons/freqy-icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
     }
   ],
-  "categories": ["music", "education", "utilities"]
+  "categories": [
+    "music",
+    "education",
+    "utilities"
+  ]
 }
