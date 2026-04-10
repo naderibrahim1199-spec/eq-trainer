@@ -6,9 +6,9 @@
 <meta name="theme-color" content="#0f0f0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="EQ Trainer">
+<meta name="apple-mobile-web-app-title" content="Freqy">
 <link rel="manifest" href="manifest.json">
-<title>EQ Ear Trainer</title>
+<title>Freqy — EQ Ear Training</title>
 <style>
 :root{
   --bg:#0f0f0f;--bg2:#1a1a1a;--bg3:#242424;--bg4:#2e2e2e;
@@ -158,9 +158,26 @@ input[type=text]:focus{border-color:var(--accent);}
 <body>
 <div id="app">
   <div class="topbar">
-    <div>
-      <div class="topbar-title" id="topbar-title">EQ Ear Trainer</div>
-      <div class="topbar-sub" id="topbar-sub">Guess mode · Beginner</div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <svg width="32" height="36" viewBox="0 0 32 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect x="0"    y="0"    width="32" height="2.2" rx="1.1" fill="white"   opacity="1.00"/>
+        <rect x="1.5"  y="3"    width="29" height="2.2" rx="1.1" fill="white"   opacity="0.80"/>
+        <rect x="3"    y="6"    width="26" height="2.2" rx="1.1" fill="white"   opacity="0.60"/>
+        <rect x="4.5"  y="9"    width="23" height="2.2" rx="1.1" fill="white"   opacity="0.42"/>
+        <rect x="6"    y="12"   width="20" height="2.2" rx="1.1" fill="white"   opacity="0.28"/>
+        <rect x="7.5"  y="15"   width="17" height="2.2" rx="1.1" fill="white"   opacity="0.16"/>
+        <rect x="9"    y="18"   width="14" height="2.5" rx="1.25" fill="white"  opacity="0.08"/>
+        <rect x="7.5"  y="21"   width="17" height="2.2" rx="1.1" fill="#ef4444" opacity="0.16"/>
+        <rect x="6"    y="24"   width="20" height="2.2" rx="1.1" fill="#ef4444" opacity="0.28"/>
+        <rect x="4.5"  y="27"   width="23" height="2.2" rx="1.1" fill="#ef4444" opacity="0.42"/>
+        <rect x="3"    y="30"   width="26" height="2.2" rx="1.1" fill="#ef4444" opacity="0.60"/>
+        <rect x="1.5"  y="33"   width="29" height="2.2" rx="1.1" fill="#ef4444" opacity="0.80"/>
+        <rect x="0"    y="36"   width="32" height="2.2" rx="1.1" fill="#ef4444" opacity="1.00"/>
+      </svg>
+      <div>
+        <div class="topbar-title" id="topbar-title" style="font-size:18px;letter-spacing:-0.5px;">Freqy</div>
+        <div class="topbar-sub" id="topbar-sub">Guess mode · Beginner</div>
+      </div>
     </div>
     <div id="topbar-right" style="display:flex;align-items:center;gap:8px;">
       <span class="badge badge-gold" id="level-badge-top">Lv 1</span>
@@ -366,7 +383,7 @@ input[type=text]:focus{border-color:var(--accent);}
     <div class="screen" id="screen-settings">
       <!-- Pro banner -->
       <div class="pro-banner">
-        <h3>⭐ Go Pro</h3>
+        <h3>⭐ Freqy Pro</h3>
         <p>Unlock unlimited rounds, all filter types, custom presets and more</p>
         <button class="btn btn-gold btn-block" style="padding:11px;font-size:14px" onclick="showProModal()">Upgrade — $1.99/month</button>
       </div>
@@ -1010,9 +1027,9 @@ function showTab(name){
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
   document.getElementById('screen-'+name).classList.add('active');
   document.getElementById('tab-'+name).classList.add('active');
-  const titles={home:'EQ Ear Trainer',quiz:'Training',playlist:'Playlist',progress:'Progress',settings:'Settings'};
+  const titles={home:'Freqy',quiz:'Training',playlist:'Playlist',progress:'Progress',settings:'Settings'};
   const subs={home:`${S.mode==='blind'?'Blind':S.mode==='guess'?'Guess':'Correct'} mode · ${S.diff.charAt(0).toUpperCase()+S.diff.slice(1)}`,quiz:'',playlist:'',progress:'',settings:''};
-  document.getElementById('topbar-title').textContent=titles[name]||'EQ Ear Trainer';
+  document.getElementById('topbar-title').textContent=titles[name]||'Freqy';
   document.getElementById('topbar-sub').textContent=subs[name]||'';
   if(name==='settings'){renderBandToggles();setMode(S.mode);setDiff(S.diff);setTimed(S.timed);setQMode(S.qMode);FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S.activeFilters.includes(k)?' active':'');});document.getElementById('q-sl').value=qToSlider(S.qFixed);document.getElementById('q-disp').textContent=fmtQ(S.qFixed);document.getElementById('q-min-sl').value=qToSlider(S.qMin);document.getElementById('q-min-disp').textContent=fmtQ(S.qMin);document.getElementById('q-max-sl').value=qToSlider(S.qMax);document.getElementById('q-max-disp').textContent=fmtQ(S.qMax);updateQHint(S.qFixed);document.getElementById('gain-range-sl').value=S.gainRange;document.getElementById('gain-range-disp').textContent=S.gainRange;document.getElementById('timed-sl').value=S.timedSecs;document.getElementById('timed-secs').textContent=S.timedSecs;renderPresetChips();}
   if(name==='progress')setTimeout(()=>{drawProgressChart();renderAllTimeStats();drawHeatmap();},50);
