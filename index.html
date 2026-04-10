@@ -153,6 +153,19 @@ input[type=file]{display:none;}
 
 input[type=text]{width:100%;padding:10px 12px;background:var(--bg3);border:0.5px solid var(--border2);border-radius:var(--radius-sm);color:var(--text);font-size:14px;font-family:inherit;outline:none;}
 input[type=text]:focus{border-color:var(--accent);}
+
+/* Onboarding */
+.onboard-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#080808;z-index:200;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.onboard-logo{display:flex;flex-direction:column;align-items:center;padding:48px 24px 24px;}
+.onboard-slide{padding:0 24px 24px;flex:1;}
+.onboard-tip{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start;}
+.onboard-tip-icon{font-size:24px;flex-shrink:0;margin-top:2px;}
+.onboard-tip-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.onboard-tip-text{font-size:13px;color:var(--text2);line-height:1.6;}
+.onboard-footer{padding:20px 24px 36px;}
+.onboard-cta{width:100%;padding:18px;background:#ef4444;border:none;border-radius:var(--radius);color:#fff;font-size:17px;font-weight:700;cursor:pointer;font-family:inherit;letter-spacing:0.5px;}
+.onboard-cta:active{opacity:0.85;transform:scale(0.98);}
+.onboard-skip{display:block;text-align:center;margin-top:14px;font-size:13px;color:var(--text3);cursor:pointer;padding:8px;}
 </style>
 </head>
 <body>
@@ -480,6 +493,79 @@ input[type=text]:focus{border-color:var(--accent);}
     </button>
   </div>
 
+  <!-- Onboarding -->
+  <div class="onboard-overlay" id="onboard-overlay">
+    <div class="onboard-logo">
+      <svg width="52" height="60" viewBox="0 0 52 60" fill="none">
+        <rect x="0"   y="0"  width="52" height="3.5" rx="1.75" fill="white"   opacity="1.00"/>
+        <rect x="2.5" y="5"  width="47" height="3.5" rx="1.75" fill="white"   opacity="0.80"/>
+        <rect x="5"   y="10" width="42" height="3.5" rx="1.75" fill="white"   opacity="0.60"/>
+        <rect x="7.5" y="15" width="37" height="3.5" rx="1.75" fill="white"   opacity="0.42"/>
+        <rect x="10"  y="20" width="32" height="3.5" rx="1.75" fill="white"   opacity="0.28"/>
+        <rect x="12.5" y="25" width="27" height="3.5" rx="1.75" fill="white"  opacity="0.16"/>
+        <rect x="15"  y="30" width="22" height="4"   rx="2"    fill="white"   opacity="0.08"/>
+        <rect x="12.5" y="35" width="27" height="3.5" rx="1.75" fill="#ef4444" opacity="0.16"/>
+        <rect x="10"  y="40" width="32" height="3.5" rx="1.75" fill="#ef4444" opacity="0.28"/>
+        <rect x="7.5" y="45" width="37" height="3.5" rx="1.75" fill="#ef4444" opacity="0.42"/>
+        <rect x="5"   y="50" width="42" height="3.5" rx="1.75" fill="#ef4444" opacity="0.60"/>
+        <rect x="2.5" y="55" width="47" height="3.5" rx="1.75" fill="#ef4444" opacity="0.80"/>
+        <rect x="0"   y="60" width="52" height="3.5" rx="1.75" fill="#ef4444" opacity="1.00"/>
+      </svg>
+      <div style="margin-top:18px;font-size:32px;font-weight:800;letter-spacing:6px;color:white;">FREQY</div>
+      <div style="font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:5px;margin-top:6px;">EQ EAR TRAINING</div>
+    </div>
+
+    <div class="onboard-slide">
+      <div style="font-size:22px;font-weight:700;color:white;margin-bottom:6px;text-align:center">Before you start</div>
+      <div style="font-size:14px;color:rgba(255,255,255,0.4);text-align:center;margin-bottom:24px;line-height:1.6">A few tips to get the most out of your training and develop critical ears faster</div>
+
+      <div class="onboard-tip">
+        <div class="onboard-tip-icon">🎧</div>
+        <div>
+          <div class="onboard-tip-title">Use proper headphones</div>
+          <div class="onboard-tip-text">Always train with a good pair of over-ear headphones. Earbuds and laptop speakers color the sound too much and will train your ears incorrectly. Bluetooth is not preferable — wired is always more accurate. If you must use Bluetooth, make sure your headphones and phone both support LDAC for the highest quality wireless audio.</div>
+        </div>
+      </div>
+
+      <div class="onboard-tip">
+        <div class="onboard-tip-icon">🔌</div>
+        <div>
+          <div class="onboard-tip-title">Use a decent DAC/dongle</div>
+          <div class="onboard-tip-text">Your phone's built-in audio output is often noisy and limited. A simple USB-C DAC dongle makes a huge difference — it gives you cleaner, more accurate audio so you can hear subtle EQ changes properly.</div>
+        </div>
+      </div>
+
+      <div class="onboard-tip">
+        <div class="onboard-tip-icon">🎯</div>
+        <div>
+          <div class="onboard-tip-title">Stick with your production headphones</div>
+          <div class="onboard-tip-text">Train with the same headphones you use to mix and produce. This builds a deep understanding of how YOUR headphones color the sound — which is exactly what you need to make better mixing decisions faster.</div>
+        </div>
+      </div>
+
+      <div class="onboard-tip">
+        <div class="onboard-tip-icon">📈</div>
+        <div>
+          <div class="onboard-tip-title">Be consistent, not intense</div>
+          <div class="onboard-tip-text">15–30 minutes of focused daily training beats hour-long sessions once a week. Your ears and brain need repeated exposure over time to build real frequency memory. Use the daily streak to stay on track.</div>
+        </div>
+      </div>
+
+      <div class="onboard-tip">
+        <div class="onboard-tip-icon">🎵</div>
+        <div>
+          <div class="onboard-tip-title">Use your own music</div>
+          <div class="onboard-tip-text">Once you're comfortable with pink noise, switch to music you actually work with. Training on familiar tracks makes it much easier to notice EQ changes and builds practical ear memory for real sessions.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="onboard-footer">
+      <button class="onboard-cta" onclick="dismissOnboard()">Let's train</button>
+      <span class="onboard-skip" onclick="dismissOnboard()">Skip intro</span>
+    </div>
+  </div>
+
   <!-- Session summary modal -->
   <div class="modal-overlay" id="summary-modal" style="display:none">
     <div class="modal">
@@ -715,13 +801,40 @@ function pickQ(){if(S.qMode==='fixed')return S.qFixed;const lo=Math.log(S.qMin),
 // ---------- AUDIO ----------
 function initAudio(){
   if(audioCtx)return;
-  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  const opts={latencyHint:'playback',sampleRate:48000};
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)(opts);
   filterNode=audioCtx.createBiquadFilter();filterNode.type='peaking';filterNode.Q.value=1.41;
   dryGainNode=audioCtx.createGain();dryGainNode.gain.value=1;
   wetGainNode=audioCtx.createGain();wetGainNode.gain.value=0;
   gainNode=audioCtx.createGain();gainNode.gain.value=0.75;
   filterNode.connect(wetGainNode);wetGainNode.connect(gainNode);
   dryGainNode.connect(gainNode);gainNode.connect(audioCtx.destination);
+  checkBluetooth();
+}
+
+function checkBluetooth(){
+  if(!navigator.mediaDevices||!navigator.mediaDevices.enumerateDevices)return;
+  navigator.mediaDevices.enumerateDevices().then(devices=>{
+    const hasOutput=devices.some(d=>d.kind==='audiooutput');
+    const label=devices.find(d=>d.kind==='audiooutput'&&d.label);
+    if(label&&label.label){
+      const lbl=label.label.toLowerCase();
+      const isBT=lbl.includes('bluetooth')||lbl.includes('bt ')||lbl.includes('wireless')||lbl.includes('airpod')||lbl.includes('headset');
+      if(isBT){showBTWarning(label.label);}
+    }
+  }).catch(()=>{});
+}
+
+function showBTWarning(deviceName){
+  const existing=document.getElementById('bt-warning');
+  if(existing)return;
+  const el=document.createElement('div');
+  el.id='bt-warning';
+  el.style.cssText='background:rgba(245,158,11,0.12);border:0.5px solid rgba(245,158,11,0.4);border-radius:9px;padding:10px 12px;margin-bottom:10px;font-size:12px;color:#f59e0b;line-height:1.5;';
+  el.innerHTML="<strong>Bluetooth detected</strong> — For best results, enable LDAC in your phone's Bluetooth settings (Settings → Connections → Bluetooth → device settings → HD Audio/LDAC). Wired is always more accurate.";
+  const home=document.getElementById('screen-home');
+  const firstCard=home.querySelector('.card');
+  if(firstCard)home.insertBefore(el,firstCard);
 }
 function makeNoise(type){
   const len=audioCtx.sampleRate*3,buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate),d=buf.getChannelData(0);
@@ -1049,6 +1162,23 @@ loadAll();
 setTimeout(setupWaveformTouch,500);
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 document.body.addEventListener('touchmove',e=>{if(e.target.closest('.content'))return;e.preventDefault();},{passive:false});
+
+// Onboarding
+function checkOnboard(){
+  if(!localStorage.getItem('freqy_onboarded')){
+    document.getElementById('onboard-overlay').style.display='flex';
+  } else {
+    document.getElementById('onboard-overlay').style.display='none';
+  }
+}
+function dismissOnboard(){
+  localStorage.setItem('freqy_onboarded','1');
+  const el=document.getElementById('onboard-overlay');
+  el.style.opacity='0';
+  el.style.transition='opacity 0.4s';
+  setTimeout(()=>{el.style.display='none';},400);
+}
+checkOnboard();
 
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
