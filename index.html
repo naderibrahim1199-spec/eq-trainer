@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' file: 'unsafe-inline' 'unsafe-eval'; media-src * blob: data:; img-src 'self' data: blob:;">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#0f0f0f">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -25,9 +26,9 @@
   --safe-bottom:env(safe-area-inset-bottom,0px);
   --tabbar-h:70px;
 }
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;}
-#app{height:100%;display:flex;flex-direction:column;padding-top:var(--safe-top);}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none;}
+#app{height:100%;display:flex;flex-direction:column;padding-top:var(--safe-top);position:relative;}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:12px 16px 10px;border-bottom:0.5px solid var(--border);flex-shrink:0;}
 .topbar-title{font-size:17px;font-weight:700;letter-spacing:-0.5px;}
 .topbar-sub{font-size:11px;color:var(--text2);margin-top:1px;}
@@ -155,9 +156,10 @@ input[type=text]{width:100%;padding:10px 12px;background:var(--bg3);border:0.5px
 input[type=text]:focus{border-color:var(--accent);}
 
 /* Onboarding */
-.onboard-overlay{position:absolute;top:0;left:0;right:0;bottom:0;background:#080808;z-index:200;display:flex;flex-direction:column;overflow-y:auto;-webkit-overflow-scrolling:touch;}
+.onboard-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:#080808;z-index:200;overflow-y:scroll;-webkit-overflow-scrolling:touch;}
+.onboard-scroll{position:absolute;top:0;left:0;right:0;bottom:0;overflow-y:scroll;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .onboard-logo{display:flex;flex-direction:column;align-items:center;padding:48px 24px 24px;}
-.onboard-slide{padding:0 24px 24px;flex:1;}
+.onboard-slide{padding:0 24px 24px;}
 .onboard-tip{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;display:flex;gap:14px;align-items:flex-start;}
 .onboard-tip-icon{font-size:24px;flex-shrink:0;margin-top:2px;}
 .onboard-tip-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
@@ -269,6 +271,8 @@ input[type=text]:focus{border-color:var(--accent);}
         <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
         Start training
       </button>
+
+      <div style="text-align:center;padding:10px 0 6px;font-size:10px;color:rgba(255,255,255,0.2);">© 2026 Sotem Gate LLC. All rights reserved.</div>
 
       <button id="install-btn" onclick="installApp()" style="display:none;width:100%;margin-top:10px;padding:14px;background:transparent;border:1px solid rgba(255,255,255,0.2);border-radius:14px;color:white;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;display:none;align-items:center;justify-content:center;gap:8px;">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4v12m-4-4l4 4 4-4M4 20h16"/></svg>
@@ -493,23 +497,22 @@ input[type=text]:focus{border-color:var(--accent);}
     </button>
   </div>
 
+
   <!-- Onboarding -->
-  <div class="onboard-overlay" id="onboard-overlay">
+  <div id="onboard-overlay" style="display:none">
     <div class="onboard-logo">
-      <svg width="52" height="60" viewBox="0 0 52 60" fill="none">
-        <rect x="0"   y="0"  width="52" height="3.5" rx="1.75" fill="white"   opacity="1.00"/>
-        <rect x="2.5" y="5"  width="47" height="3.5" rx="1.75" fill="white"   opacity="0.80"/>
-        <rect x="5"   y="10" width="42" height="3.5" rx="1.75" fill="white"   opacity="0.60"/>
-        <rect x="7.5" y="15" width="37" height="3.5" rx="1.75" fill="white"   opacity="0.42"/>
-        <rect x="10"  y="20" width="32" height="3.5" rx="1.75" fill="white"   opacity="0.28"/>
-        <rect x="12.5" y="25" width="27" height="3.5" rx="1.75" fill="white"  opacity="0.16"/>
-        <rect x="15"  y="30" width="22" height="4"   rx="2"    fill="white"   opacity="0.08"/>
-        <rect x="12.5" y="35" width="27" height="3.5" rx="1.75" fill="#ef4444" opacity="0.16"/>
-        <rect x="10"  y="40" width="32" height="3.5" rx="1.75" fill="#ef4444" opacity="0.28"/>
-        <rect x="7.5" y="45" width="37" height="3.5" rx="1.75" fill="#ef4444" opacity="0.42"/>
-        <rect x="5"   y="50" width="42" height="3.5" rx="1.75" fill="#ef4444" opacity="0.60"/>
-        <rect x="2.5" y="55" width="47" height="3.5" rx="1.75" fill="#ef4444" opacity="0.80"/>
-        <rect x="0"   y="60" width="52" height="3.5" rx="1.75" fill="#ef4444" opacity="1.00"/>
+      <svg width="52" height="64" viewBox="0 0 52 64" fill="none">
+        <rect x="0"   y="0"  width="52" height="4" rx="2" fill="white"   opacity="1.00"/>
+        <rect x="2.5" y="6"  width="47" height="4" rx="2" fill="white"   opacity="0.80"/>
+        <rect x="5"   y="12" width="42" height="4" rx="2" fill="white"   opacity="0.60"/>
+        <rect x="7.5" y="18" width="37" height="4" rx="2" fill="white"   opacity="0.42"/>
+        <rect x="10"  y="24" width="32" height="4" rx="2" fill="white"   opacity="0.28"/>
+        <rect x="12.5" y="30" width="27" height="4" rx="2" fill="white"  opacity="0.16"/>
+        <rect x="15"  y="36" width="22" height="4" rx="2" fill="white"   opacity="0.08"/>
+        <rect x="12.5" y="42" width="27" height="4" rx="2" fill="#ef4444" opacity="0.16"/>
+        <rect x="10"  y="48" width="32" height="4" rx="2" fill="#ef4444" opacity="0.28"/>
+        <rect x="7.5" y="54" width="37" height="4" rx="2" fill="#ef4444" opacity="0.42"/>
+        <rect x="5"   y="60" width="42" height="4" rx="2" fill="#ef4444" opacity="0.60"/>
       </svg>
       <div style="margin-top:18px;font-size:32px;font-weight:800;letter-spacing:6px;color:white;">FREQY</div>
       <div style="font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:5px;margin-top:6px;">EQ EAR TRAINING</div>
@@ -555,7 +558,7 @@ input[type=text]:focus{border-color:var(--accent);}
         <div class="onboard-tip-icon">🎵</div>
         <div>
           <div class="onboard-tip-title">Use your own music</div>
-          <div class="onboard-tip-text">Once you're comfortable with pink noise, switch to music you actually work with. Training on familiar tracks makes it much easier to notice EQ changes and builds practical ear memory for real sessions.</div>
+          <div class="onboard-tip-text">Once you are comfortable with pink noise, switch to music you actually work with. Training on familiar tracks makes it much easier to notice EQ changes and builds practical ear memory for real sessions.</div>
         </div>
       </div>
     </div>
@@ -640,7 +643,7 @@ function saveAll(){
       mode:S.mode,diff:S.diff,activeFreqs:S.activeFreqs,activeFilters:S.activeFilters,
       gainRange:S.gainRange,source:S.source,qMode:S.qMode,qFixed:S.qFixed,
       qMin:S.qMin,qMax:S.qMax,timed:S.timed,timedSecs:S.timedSecs,
-      playlistNames:playlist.map(p=>p.name)
+      playlistNames:playlist.map(p=>p.name),playlistCount:playlist.length
     };
     localStorage.setItem('eqt3',JSON.stringify(d));
   }catch(e){}
@@ -666,6 +669,8 @@ function loadAll(){
       const note=document.getElementById('now-playing-status');
       if(note)note.textContent='Re-add your files in Playlist tab';
     }
+    // Load tracks from separate storage after a short delay
+    setTimeout(loadTracksFromStorage, 300);
     updateStats();updateXPBar();updateStreakUI();renderPresetChips();
   }catch(e){}
 }
@@ -870,19 +875,131 @@ function setPlayingDot(on){const d=document.getElementById('playing-dot');if(!d)
 
 // ---------- PLAYLIST ----------
 function addFilesToPlaylist(inp){
+  // Check if running in native app
+  if(window.FreqyNative&&window.FreqyNative.isNativeApp()){
+    // Native: Java will call addTrackFromNative() directly
+    // Just trigger the file picker via the bridge
+    window.FreqyNative.triggerFilePicker();
+    return;
+  }
+  // Browser fallback: use FileReader
   const files=Array.from(inp.files);if(!files.length)return;initAudio();
   let loaded=0;
   files.forEach(file=>{
     const reader=new FileReader();
     reader.onload=e=>{
       audioCtx.decodeAudioData(e.target.result,buf=>{
-        playlist.push({name:file.name.replace(/\.[^.]+$/,''),buffer:buf,duration:buf.duration});
+        const bytes=new Uint8Array(e.target.result);
+        let b64='';const chunk=8192;
+        for(let i=0;i<bytes.length;i+=chunk){b64+=String.fromCharCode.apply(null,bytes.subarray(i,i+chunk));}
+        b64=btoa(b64);
+        playlist.push({name:file.name.replace(/\.[^.]+$/,''),buffer:buf,duration:buf.duration,type:file.type,b64:b64});
         loaded++;if(loaded===files.length){renderPlaylist();saveAll();}
       },()=>{loaded++;if(loaded===files.length)renderPlaylist();});
     };
     reader.readAsArrayBuffer(file);
   });
   inp.value='';
+}
+
+// Called by Java native bridge — receives file as data URL
+function addTrackFromNative(name, dataUrl, mimeType){
+  initAudio();
+  // Convert data URL to ArrayBuffer
+  const base64 = dataUrl.split(',')[1];
+  const binaryStr = atob(base64);
+  const bytes = new Uint8Array(binaryStr.length);
+  for(let i=0;i<binaryStr.length;i++) bytes[i]=binaryStr.charCodeAt(i);
+  const arrayBuffer = bytes.buffer;
+  audioCtx.decodeAudioData(arrayBuffer, buf=>{
+    playlist.push({name:name, buffer:buf, duration:buf.duration, type:mimeType, b64:base64});
+    renderPlaylist();
+    saveAll();
+    saveTracksToStorage();
+    document.getElementById('now-playing-name').textContent=name;
+    document.getElementById('now-playing-status').textContent=fmtDur(buf.duration)+' · tap Play to start';
+    document.getElementById('now-playing-wrap').style.display='block';
+  }, err=>{
+    console.error('Failed to decode:', name, err);
+  });
+}
+
+function restorePlaylist(files){
+  // Legacy support - ignore, we now use saveTracksToStorage
+}
+
+// IndexedDB storage for audio tracks (no size limit)
+let freqyDB = null;
+
+function openDB(callback){
+  if(freqyDB){callback(freqyDB);return;}
+  const req = indexedDB.open('FreqyTracks', 1);
+  req.onupgradeneeded = e => {
+    const db = e.target.result;
+    if(!db.objectStoreNames.contains('tracks')){
+      db.createObjectStore('tracks', {keyPath:'id'});
+    }
+  };
+  req.onsuccess = e => { freqyDB = e.target.result; callback(freqyDB); };
+  req.onerror = () => { console.error('IndexedDB failed'); };
+}
+
+function saveTracksToStorage(){
+  openDB(db => {
+    const tx = db.transaction('tracks', 'readwrite');
+    const store = tx.objectStore('tracks');
+    // Clear existing
+    store.clear();
+    // Save each track
+    playlist.forEach((track, i) => {
+      if(!track.b64) return;
+      store.put({
+        id: i,
+        name: track.name,
+        type: track.type || 'audio/mpeg',
+        b64: track.b64
+      });
+    });
+    tx.oncomplete = () => {
+      localStorage.setItem('freqy_track_count', String(playlist.filter(t=>t.b64).length));
+    };
+    tx.onerror = e => console.error('Save tracks error:', e);
+  });
+}
+
+function loadTracksFromStorage(){
+  const count = parseInt(localStorage.getItem('freqy_track_count')||'0');
+  if(!count) return;
+  initAudio();
+  openDB(db => {
+    const tx = db.transaction('tracks', 'readonly');
+    const store = tx.objectStore('tracks');
+    const req = store.getAll();
+    req.onsuccess = e => {
+      const tracks = e.target.result;
+      if(!tracks || !tracks.length) return;
+      let loaded = 0;
+      tracks.forEach(f => {
+        try{
+          const bin = atob(f.b64);
+          const bytes = new Uint8Array(bin.length);
+          for(let j=0;j<bin.length;j++) bytes[j] = bin.charCodeAt(j);
+          audioCtx.decodeAudioData(bytes.buffer, decoded => {
+            playlist.push({name:f.name, buffer:decoded, duration:decoded.duration, type:f.type, b64:f.b64});
+            loaded++;
+            renderPlaylist();
+            if(loaded === tracks.length){
+              document.getElementById('now-playing-name').textContent='Playlist restored';
+              document.getElementById('now-playing-status').textContent=tracks.length+' tracks loaded — tap one to start';
+              document.getElementById('now-playing-wrap').style.display='block';
+              if(S.source==='file') setSource('file');
+            }
+          }, () => { loaded++; });
+        }catch(e){ loaded++; }
+      });
+    };
+    req.onerror = e => console.error('Load tracks error:', e);
+  });
 }
 function loadTrack(idx){
   currentTrackIdx=idx;loopStart=0;loopEnd=null;
@@ -896,7 +1013,7 @@ function removeTrack(idx,e){
   e.stopPropagation();
   if(currentTrackIdx===idx){stopAudio();currentTrackIdx=-1;document.getElementById('now-playing-wrap').style.display='none';}
   else if(currentTrackIdx>idx)currentTrackIdx--;
-  playlist.splice(idx,1);renderPlaylist();saveAll();
+  playlist.splice(idx,1);renderPlaylist();saveAll();saveTracksToStorage();
 }
 function renderPlaylist(){
   const el=document.getElementById('playlist-list');
@@ -1094,7 +1211,7 @@ function timeOut(){
   drawEQ(true);const fi=FREQS.indexOf(S.currentFreq);
   document.querySelectorAll('.freq-btn').forEach(b=>{if(parseInt(b.dataset.freq)===S.currentFreq)b.className='freq-btn correct';});
   document.getElementById('answer-panel').style.display='block';
-  document.getElementById('result-text').textContent="Time's up!";document.getElementById('result-text').style.color='#ef4444';
+  document.getElementById("result-text").textContent="Time's up!";document.getElementById('result-text').style.color='#ef4444';
   document.getElementById('result-detail').textContent='Answer: '+FREQ_LABELS[fi]+' Hz · Q '+fmtQ(S.currentQ);
   document.getElementById('acc-meter').style.width='0%';document.getElementById('acc-meter').style.background='#ef4444';
   document.getElementById('xp-earned').textContent='+1 XP';
@@ -1161,24 +1278,26 @@ FILTER_TYPES.forEach(k=>{document.getElementById('ftype-'+k).className='pill'+(S
 loadAll();
 setTimeout(setupWaveformTouch,500);
 if('serviceWorker' in navigator){window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
-document.body.addEventListener('touchmove',e=>{if(e.target.closest('.content'))return;e.preventDefault();},{passive:false});
-
+document.body.addEventListener('touchmove',e=>{if(e.target.closest('.content')||e.target.closest('#onboard-overlay'))return;e.preventDefault();},{passive:false});
 // Onboarding
-function checkOnboard(){
-  if(!localStorage.getItem('freqy_onboarded')){
-    document.getElementById('onboard-overlay').style.display='flex';
-  } else {
-    document.getElementById('onboard-overlay').style.display='none';
+function dismissOnboard(){
+  localStorage.setItem('freqy_ob','1');
+  document.getElementById('onboard-overlay').style.display='none';
+  document.body.style.overflow='hidden';
+  document.documentElement.style.overflow='hidden';
+}
+function checkOb(){
+  if(!localStorage.getItem('freqy_ob')){
+    document.getElementById('onboard-overlay').style.display='block';
+    document.body.style.overflow='auto';
+    document.documentElement.style.overflow='auto';
   }
 }
-function dismissOnboard(){
-  localStorage.setItem('freqy_onboarded','1');
-  const el=document.getElementById('onboard-overlay');
-  el.style.opacity='0';
-  el.style.transition='opacity 0.4s';
-  setTimeout(()=>{el.style.display='none';},400);
-}
-checkOnboard();
+checkOb();
+
+
+
+
 
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
