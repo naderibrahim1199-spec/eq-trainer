@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#080808">
+<meta name="description" content="Train your ears to hear EQ changes like a pro. Freqy is the EQ ear training app for music producers and audio engineers. Launching soon on Android.">
+<meta property="og:title" content="Freqy — EQ Ear Training for Producers">
+<meta property="og:description" content="Train your ears to hear EQ changes. Mix better. Launching soon on Android.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://freqy.app">
+<title>Freqy — EQ Ear Training for Music Producers</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,'Inter','Segoe UI',sans-serif;
+  background:#080808;
+  color:#fff;
+  line-height:1.6;
+  overflow-x:hidden;
+}
+
+/* Container */
+.container{max-width:1100px;margin:0 auto;padding:0 24px;}
+
+/* Nav */
+nav{
+  position:fixed;top:0;left:0;right:0;
+  padding:18px 24px;
+  background:rgba(8,8,8,0.85);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  z-index:100;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.nav-inner{
+  max-width:1100px;margin:0 auto;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.logo{
+  display:flex;align-items:center;gap:10px;
+  text-decoration:none;color:#fff;
+}
+.logo-text{font-size:18px;font-weight:700;letter-spacing:3px;}
+.nav-cta{
+  padding:10px 20px;background:#ef4444;color:#fff;
+  text-decoration:none;border-radius:8px;
+  font-size:14px;font-weight:600;
+  transition:background 0.2s;
+}
+.nav-cta:hover{background:#dc2626;}
+
+/* Hero */
+.hero{
+  min-height:100vh;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;
+  padding:120px 24px 60px;
+  position:relative;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;top:0;left:0;right:0;bottom:0;
+  background:radial-gradient(circle at 50% 30%, rgba(239,68,68,0.15) 0%, transparent 50%);
+  z-index:0;
+}
+.hero-content{position:relative;z-index:1;max-width:780px;}
+.hero-badge{
+  display:inline-block;
+  padding:6px 14px;
+  background:rgba(239,68,68,0.1);
+  border:1px solid rgba(239,68,68,0.3);
+  color:#ef4444;
+  font-size:12px;
+  font-weight:600;
+  letter-spacing:1px;
+  border-radius:20px;
+  margin-bottom:24px;
+  text-transform:uppercase;
+}
+.hero h1{
+  font-size:64px;
+  font-weight:800;
+  line-height:1.05;
+  letter-spacing:-2px;
+  margin-bottom:24px;
+}
+.hero h1 .accent{color:#ef4444;}
+.hero p{
+  font-size:20px;
+  color:rgba(255,255,255,0.6);
+  margin-bottom:40px;
+  max-width:600px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.hero-form{
+  display:flex;gap:8px;
+  max-width:480px;margin:0 auto;
+  flex-wrap:wrap;justify-content:center;
+}
+.hero-form input{
+  flex:1;min-width:240px;
+  padding:16px 20px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.15);
+  border-radius:10px;
+  color:#fff;
+  font-size:15px;
+  outline:none;
+  font-family:inherit;
+  transition:border-color 0.2s;
+}
+.hero-form input:focus{border-color:#ef4444;}
+.hero-form input::placeholder{color:rgba(255,255,255,0.4);}
+.hero-form button{
+  padding:16px 28px;
+  background:#ef4444;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+  font-weight:600;
+  cursor:pointer;
+  font-family:inherit;
+  transition:background 0.2s,transform 0.1s;
+}
+.hero-form button:hover{background:#dc2626;}
+.hero-form button:active{transform:scale(0.98);}
+.hero-form button:disabled{opacity:0.6;cursor:wait;}
+.hero-msg{
+  margin-top:20px;font-size:14px;min-height:20px;
+}
+.hero-trust{
+  margin-top:32px;
+  font-size:13px;
+  color:rgba(255,255,255,0.4);
+}
+
+/* Section base */
+section{padding:100px 24px;}
+.section-title{
+  font-size:44px;
+  font-weight:800;
+  letter-spacing:-1px;
+  text-align:center;
+  margin-bottom:18px;
+  line-height:1.1;
+}
+.section-title .accent{color:#ef4444;}
+.section-sub{
+  font-size:18px;
+  color:rgba(255,255,255,0.5);
+  text-align:center;
+  margin-bottom:60px;
+  max-width:560px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* Problem section */
+.problem{background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.04);border-bottom:1px solid rgba(255,255,255,0.04);}
+.quotes{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:20px;
+  max-width:900px;
+  margin:0 auto;
+}
+.quote{
+  padding:28px;
+  background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);
+  border-radius:14px;
+  font-size:16px;
+  color:rgba(255,255,255,0.75);
+  font-style:italic;
+  line-height:1.6;
+}
+.quote::before{content:'"';color:#ef4444;font-size:32px;font-weight:700;display:block;line-height:0.5;margin-bottom:8px;font-style:normal;}
+
+/* Features */
+.features-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+.feature{
+  padding:32px;
+  background:rgba(255,255,255,0.02);
+  border:1px solid rgba(255,255,255,0.06);
+  border-radius:16px;
+  transition:border-color 0.2s,transform 0.2s;
+}
+.feature:hover{
+  border-color:rgba(239,68,68,0.3);
+  transform:translateY(-2px);
+}
+.feature-icon{
+  width:48px;height:48px;
+  background:rgba(239,68,68,0.1);
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:18px;
+}
+.feature h3{font-size:18px;font-weight:700;margin-bottom:8px;}
+.feature p{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.6;}
+
+/* How it works */
+.steps{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+  gap:32px;
+  max-width:1000px;
+  margin:0 auto;
+}
+.step{text-align:center;}
+.step-num{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:56px;height:56px;
+  background:#ef4444;
+  border-radius:50%;
+  font-size:22px;font-weight:800;
+  margin-bottom:18px;
+}
+.step h3{font-size:20px;font-weight:700;margin-bottom:8px;}
+.step p{color:rgba(255,255,255,0.55);font-size:15px;}
+
+/* Final CTA */
+.final-cta{
+  background:linear-gradient(180deg,#0a0a0a 0%,#080808 100%);
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,0.04);
+}
+.final-cta .container{max-width:680px;}
+
+/* Footer */
+footer{
+  padding:40px 24px;
+  text-align:center;
+  border-top:1px solid rgba(255,255,255,0.05);
+  font-size:13px;
+  color:rgba(255,255,255,0.35);
+}
+footer a{color:rgba(255,255,255,0.5);text-decoration:none;}
+footer a:hover{color:#ef4444;}
+
+/* Mobile */
+@media(max-width:640px){
+  .hero h1{font-size:42px;letter-spacing:-1px;}
+  .hero p{font-size:17px;}
+  .section-title{font-size:32px;}
+  .section-sub{font-size:16px;}
+  section{padding:70px 24px;}
+  .hero-form input{min-width:200px;}
+  .nav-inner{gap:10px;}
+  .logo-text{font-size:15px;letter-spacing:2px;}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="logo">
+      <svg width="28" height="32" viewBox="0 0 32 36" fill="none">
+        <rect x="0" y="0" width="32" height="2.2" rx="1.1" fill="white"/>
+        <rect x="3" y="6" width="26" height="2.2" rx="1.1" fill="white" opacity="0.6"/>
+        <rect x="6" y="12" width="20" height="2.2" rx="1.1" fill="white" opacity="0.3"/>
+        <rect x="6" y="24" width="20" height="2.2" rx="1.1" fill="#ef4444" opacity="0.3"/>
+        <rect x="3" y="30" width="26" height="2.2" rx="1.1" fill="#ef4444" opacity="0.6"/>
+        <rect x="0" y="36" width="32" height="2.2" rx="1.1" fill="#ef4444"/>
+      </svg>
+      <span class="logo-text">FREQY</span>
+    </a>
+    <a href="#waitlist" class="nav-cta">Join waitlist</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-badge">Launching soon on Android</div>
+    <h1>Train your ears to hear <span class="accent">EQ like a pro.</span></h1>
+    <p>Freqy is the mobile ear training app that teaches you to identify frequencies by ear. Stop guessing on your mixes. Start hearing them.</p>
+    
+    <form class="hero-form" id="waitlist-form-hero">
+      <input type="email" id="waitlist-email-hero" placeholder="your@email.com" required>
+      <button type="submit" id="waitlist-btn-hero">Get notified</button>
+    </form>
+    <div class="hero-msg" id="waitlist-msg-hero"></div>
+    <div class="hero-trust">No spam. One email when we launch.</div>
+  </div>
+</section>
+
+<!-- PROBLEM -->
+<section class="problem">
+  <div class="container">
+    <h2 class="section-title">Sound familiar?</h2>
+    <p class="section-sub">Every producer hits this wall. Most never break through.</p>
+    <div class="quotes">
+      <div class="quote">I can't tell if my mix is bright enough or harsh.</div>
+      <div class="quote">My EQ moves feel random. Nothing ever sounds right.</div>
+      <div class="quote">I don't know what 3 kHz actually sounds like in a mix.</div>
+      <div class="quote">My mixes sound great in my studio. Bad everywhere else.</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section>
+  <div class="container">
+    <h2 class="section-title">A gym for <span class="accent">your ears.</span></h2>
+    <p class="section-sub">Built by an audio engineer for engineers and producers who want to actually improve.</p>
+    
+    <div class="features-grid">
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M3 12h4l3-9 4 18 3-9h4"/></svg>
+        </div>
+        <h3>Real EQ training</h3>
+        <p>Hear frequencies boosted or cut on real audio. Pink noise, white noise, or your own music.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 3"/></svg>
+        </div>
+        <h3>Multiple modes</h3>
+        <p>Guess, Correct, and Blind modes. Bell, shelf, high-pass filters. Variable Q. Train however you learn best.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <h3>Track your progress</h3>
+        <p>XP, streaks, and a heatmap that shows your weak frequencies. See your ears improve over time.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+        </div>
+        <h3>Use your music</h3>
+        <p>Upload your favorite tracks. Train on the music you actually mix. Loop any section.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15 15 0 010 20"/></svg>
+        </div>
+        <h3>Cloud sync</h3>
+        <p>Your progress follows you. Sign in once, train on any device, never lose your XP.</p>
+      </div>
+      
+      <div class="feature">
+        <div class="feature-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        </div>
+        <h3>Built for focus</h3>
+        <p>Clean dark interface. No ads. No distractions. Just you, your headphones, and frequencies.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section style="background:#0a0a0a;border-top:1px solid rgba(255,255,255,0.04);">
+  <div class="container">
+    <h2 class="section-title">How it works</h2>
+    <p class="section-sub">Three steps. 15 minutes a day. Real results.</p>
+    
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>Listen</h3>
+        <p>Hear a sound with a hidden EQ boost or cut at one frequency.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>Guess</h3>
+        <p>Pick which frequency was affected. 32 Hz to 16 kHz, ten bands total.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>Improve</h3>
+        <p>Earn XP, build streaks, see your weakness map. Train your ears like a pro.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-cta" id="waitlist">
+  <div class="container">
+    <h2 class="section-title">Be the first <span class="accent">to train.</span></h2>
+    <p class="section-sub">Join the waitlist. Get notified the moment Freqy launches on Android.</p>
+    
+    <form class="hero-form" id="waitlist-form-final" style="margin:0 auto;">
+      <input type="email" id="waitlist-email-final" placeholder="your@email.com" required>
+      <button type="submit" id="waitlist-btn-final">Join waitlist</button>
+    </form>
+    <div class="hero-msg" id="waitlist-msg-final"></div>
+    <div class="hero-trust">Built by Sotem Gate LLC. Made by audio engineers, for audio engineers.</div>
+  </div>
+</section>
+
+<footer>
+  <div>
+    © 2026 Sotem Gate LLC. All rights reserved.
+  </div>
+  <div style="margin-top:8px;">
+    <a href="https://sotemgate.com">sotemgate.com</a>
+    &nbsp;·&nbsp;
+    <a href="mailto:media@freqy.app">media@freqy.app</a>
+    &nbsp;·&nbsp;
+    <a href="https://tiktok.com/@freqy.app">@freqy.app</a>
+  </div>
+</footer>
+
+<script>
+const FIREBASE_API_KEY = "AIzaSyAANHHIJT3j0kZfZL5oVBjOup5cF7XmRFY";
+const FIREBASE_PROJECT = "freqy-28b09";
+
+async function submitWaitlist(email, btn, msg, btnText) {
+  if (!email || !email.includes('@')) {
+    msg.style.color = '#ef4444';
+    msg.textContent = 'Please enter a valid email.';
+    return;
+  }
+  
+  btn.disabled = true;
+  btn.textContent = 'Joining...';
+  msg.textContent = '';
+  
+  try {
+    const docId = email.replace(/[^a-zA-Z0-9]/g, '_') + '_' + Date.now();
+    const url = 'https://firestore.googleapis.com/v1/projects/' + FIREBASE_PROJECT + '/databases/(default)/documents/waitlist/' + docId;
+    
+    const response = await fetch(url, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields: {
+          email: { stringValue: email },
+          signedUpAt: { timestampValue: new Date().toISOString() },
+          source: { stringValue: 'freqy.app' }
+        }
+      })
+    });
+    
+    if (response.ok) {
+      msg.style.color = '#10b981';
+      msg.textContent = "✓ You're on the list! See you at launch.";
+    } else {
+      msg.style.color = '#ef4444';
+      msg.textContent = 'Something went wrong. Try again?';
+    }
+  } catch (err) {
+    msg.style.color = '#ef4444';
+    msg.textContent = 'Network error. Try again?';
+  }
+  
+  btn.disabled = false;
+  btn.textContent = btnText;
+}
+
+// Hero form
+document.getElementById('waitlist-form-hero').addEventListener('submit', function(e) {
+  e.preventDefault();
+  submitWaitlist(
+    document.getElementById('waitlist-email-hero').value.trim(),
+    document.getElementById('waitlist-btn-hero'),
+    document.getElementById('waitlist-msg-hero'),
+    'Get notified'
+  );
+});
+
+// Final form
+document.getElementById('waitlist-form-final').addEventListener('submit', function(e) {
+  e.preventDefault();
+  submitWaitlist(
+    document.getElementById('waitlist-email-final').value.trim(),
+    document.getElementById('waitlist-btn-final'),
+    document.getElementById('waitlist-msg-final'),
+    'Join waitlist'
+  );
+});
+</script>
+
+</body>
+</html>
